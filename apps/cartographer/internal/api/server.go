@@ -60,11 +60,35 @@ type progressEvent struct {
 func NewServer(cfg Config) http.Handler {
 	srv := &Server{cfg: cfg, jobs: map[string]*jobState{}}
 	mux := http.NewServeMux()
+	mux.HandleFunc("/", srv.handleRoot)
 	mux.HandleFunc("/healthz", srv.handleHealthz)
 	mux.HandleFunc("/version", srv.handleVersion)
 	mux.HandleFunc("/v1/cartography", srv.handleSubmit)
 	mux.HandleFunc("/v1/cartography/", srv.handleByID)
 	return mux
+}
+
+func (s *Server) handleRoot(w http.ResponseWriter, r *http.Request) {
+	// `/` is special — net/http's ServeMux matches it as a catch-all.
+	// Distinguish a real visit to `/` from any unmatched route below
+	// `/v1/...` so unrecognised endpoints still return 404.
+	if r.URL.Path != "/" {
+		http.NotFound(w, r)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	_ = json.NewEncoder(w).Encode(map[string]any{
+		"service": "crucible-cartographer",
+		"version": s.cfg.Version,
+		"docs":    "https://github.com/stonesalltheway1/crucible#readme",
+		"endpoints": map[string]string{
+			"GET  /healthz":                          "liveness probe",
+			"GET  /version":                          "version string",
+			"POST /v1/cartography":                   "submit a CartographyJob (returns job_id)",
+			"GET  /v1/cartography/{job_id}":          "fetch the result or current status",
+			"GET  /v1/cartography/{job_id}/events":   "Server-Sent Events progress stream",
+		},
+	})
 }
 
 func (s *Server) handleHealthz(w http.ResponseWriter, r *http.Request) {
