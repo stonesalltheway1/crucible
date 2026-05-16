@@ -1,0 +1,43 @@
+[project]
+name = "crucible-distiller"
+version = "0.5.0"
+description = "Crucible procedural-memory distiller (Phase 5)"
+requires-python = ">=3.11"
+license = { file = "../../LICENSE" }
+authors = [{ name = "Crucible" }]
+# Production deps are listed but vendored at install time so the
+# hermetic-Nix build can validate the lockfile. Outlines is the
+# AdaKGC-pattern schema-constrained decoding (per Phase-5 research).
+dependencies = [
+    "httpx>=0.27,<1",
+    "anthropic>=0.40",            # Haiku 4.5 extractor + judge
+    "outlines>=1.0",              # schema-constrained decoding (AdaKGC pattern)
+    "pydantic>=2.6",
+    "tenacity>=8.5",
+    "structlog>=24.1",
+]
+
+[project.optional-dependencies]
+github  = ["PyGithub>=2.4", "gql[requests]>=3.5"]
+slack   = ["slack-sdk>=3.27"]
+confluence = ["atlassian-python-api>=3.41"]
+notion  = ["notion-client>=2.2"]
+kafka   = ["aiokafka>=0.11"]
+sqs     = ["boto3>=1.35"]
+test    = ["pytest>=8", "pytest-asyncio>=0.23", "respx>=0.21", "freezegun>=1.5"]
+spec    = ["crucible-memory-spec @ file://../../libs/memory-spec/py"]
+
+[project.scripts]
+crucible-distiller = "crucible_distiller.cli:main"
+
+[build-system]
+requires = ["hatchling>=1.21"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/crucible_distiller"]
+
+[tool.pytest.ini_options]
+addopts = "-ra -q"
+testpaths = ["tests"]
+asyncio_mode = "auto"

@@ -1,0 +1,6 @@
+apiVersion: v2
+name: twin-runtime
+description: Crucible Twin Runtime (sandbox + filesystem twin + DB twin + tape replay).
+type: application
+version: 2026.6.0
+appVersion: "2026.06.0"

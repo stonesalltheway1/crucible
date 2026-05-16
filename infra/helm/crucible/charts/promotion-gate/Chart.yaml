@@ -1,0 +1,6 @@
+apiVersion: v2
+name: promotion-gate
+description: Crucible promotion gate (Rego + KMS + Argo Rollouts + Slack approval).
+type: application
+version: 2026.6.0
+appVersion: "2026.06.0"

@@ -1,0 +1,35 @@
+[package]
+name = "twin-runtime-lifecycle"
+description = "Sandbox lifecycle orchestrator — wires SandboxProvider + fs + egress + shim + attestation"
+version = { workspace = true }
+edition = { workspace = true }
+rust-version = { workspace = true }
+license = { workspace = true }
+repository = { workspace = true }
+
+[lib]
+path = "src/lib.rs"
+
+[dependencies]
+crucible-sandbox-spec = { workspace = true }
+twin-runtime-shim = { workspace = true }
+twin-runtime-sandbox = { workspace = true }
+twin-runtime-fs = { workspace = true }
+twin-runtime-egress = { workspace = true }
+twin-runtime-attest = { workspace = true }
+async-trait = { workspace = true }
+thiserror = { workspace = true }
+tokio = { workspace = true }
+tracing = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+chrono = { workspace = true }
+futures = { workspace = true }
+
+[dev-dependencies]
+tokio = { workspace = true }
+tempfile = { workspace = true }
+pretty_assertions = { workspace = true }
+
+[lints]
+workspace = true

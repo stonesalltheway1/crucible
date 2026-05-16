@@ -1,0 +1,16 @@
+{
+  "$schema": "https://crucible.dev/schemas/feature-flag-rollout/v1",
+  "_comment": "Default rollout schedule for the feature-flag-only delivery strategy. Steps mirror the Argo Rollouts canary template.",
+  "promotion_id": "<promotion-id>",
+  "flag_key": "crucible_<promotion-id>",
+  "steps": [
+    { "weight_pct": 1,   "dwell_seconds": 300,  "slo_check": "error-rate" },
+    { "weight_pct": 5,   "dwell_seconds": 600,  "slo_check": "error-rate" },
+    { "weight_pct": 25,  "dwell_seconds": 1800, "slo_check": "error-rate" },
+    { "weight_pct": 100, "dwell_seconds": 0,    "slo_check": "error-rate" }
+  ],
+  "rollback_on_failure": {
+    "action": "disable_flag",
+    "reason_template": "SLO regression on {{slo_check}}: {{metric_value}}"
+  }
+}

@@ -1,0 +1,29 @@
+[package]
+name = "twin-runtime-egress"
+description = "Egress manifest validation + Tetragon TracingPolicy + mitmproxy config for the Crucible Twin Runtime"
+version = { workspace = true }
+edition = { workspace = true }
+rust-version = { workspace = true }
+license = { workspace = true }
+repository = { workspace = true }
+
+[lib]
+path = "src/lib.rs"
+
+[dependencies]
+crucible-sandbox-spec = { workspace = true }
+twin-runtime-shim = { workspace = true }
+async-trait = { workspace = true }
+thiserror = { workspace = true }
+tokio = { workspace = true }
+tracing = { workspace = true }
+serde = { workspace = true }
+serde_yaml = { workspace = true }
+serde_json = { workspace = true }
+url = { workspace = true }
+
+[dev-dependencies]
+pretty_assertions = { workspace = true }
+
+[lints]
+workspace = true

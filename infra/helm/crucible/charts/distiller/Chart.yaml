@@ -1,0 +1,6 @@
+apiVersion: v2
+name: distiller
+description: Crucible distiller (Python; PR-comment + ADR + incident → Convention extraction).
+type: application
+version: 2026.6.0
+appVersion: "2026.06.0"

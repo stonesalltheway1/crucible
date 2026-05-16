@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://crucible.dev/DestructiveApproval/v1",
+  "title": "DestructiveApproval",
+  "type": "object",
+  "required": ["proposal_attestation", "approval_kind", "approver_oidc_subject", "approved_at"],
+  "properties": {
+    "proposal_attestation":     { "type": "string" },
+    "approval_kind":            { "type": "string", "enum": ["auto-twin", "human-real"] },
+    "approver_oidc_subject":    { "type": "string", "format": "uri" },
+    "approved_at":              { "type": "string", "format": "date-time" },
+    "approval_attestation_id":  { "type": "string" }
+  },
+  "additionalProperties": false
+}

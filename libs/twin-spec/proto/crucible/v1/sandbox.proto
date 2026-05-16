@@ -1,0 +1,462 @@
+syntax = "proto3";
+
+package crucible.v1;
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/duration.proto";
+import "google/protobuf/struct.proto";
+import "crucible/v1/common.proto";
+
+option go_package = "github.com/crucible/sdk-go/gen/crucible/v1;cruciblev1";
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Sandbox primitives — used by twin-runtime, control-plane, and the provider
+// abstraction (E2B, raw Firecracker, Modal, Daytona, Fly Machines).
+//
+// The control plane never touches a sandbox directly; it submits a SandboxSpec
+// to the twin-runtime's SandboxProvider via the TwinRuntimeService below, and
+// the runtime owns lifecycle.
+//
+// Per ADR-015: E2B is the SaaS-tier default; raw Firecracker is the self-host
+// tier; Daytona / Fly Machines are solo-founder fallbacks. All providers
+// implement the same SandboxProvider trait/interface, defined in code at
+// libs/sandbox-spec.
+// ─────────────────────────────────────────────────────────────────────────────
+
+// SandboxKind identifies the provider family. Stable string in serialised form.
+enum SandboxKind {
+  SANDBOX_KIND_UNSPECIFIED = 0;
+  SANDBOX_KIND_E2B = 1;                  // Hosted Firecracker via E2B SaaS
+  SANDBOX_KIND_RAW_FIRECRACKER = 2;      // Self-orchestrated Firecracker + containerd + ZFS
+  SANDBOX_KIND_MODAL = 3;                // Modal Sandbox (GPU-capable fallback)
+  SANDBOX_KIND_DAYTONA = 4;              // Daytona dev workspaces (solo-founder tier)
+  SANDBOX_KIND_FLY_MACHINES = 5;         // Fly Machines (scale-to-zero)
+  SANDBOX_KIND_LOCAL_DOCKER = 6;         // Dev / CI only; not for tenant traffic
+}
+
+// SandboxKillReason narrates why a sandbox died. Recorded in attestations so
+// post-hoc analysis can distinguish "agent finished" from "we killed it for
+// safety" — these are not the same security event.
+enum SandboxKillReason {
+  SANDBOX_KILL_REASON_UNSPECIFIED = 0;
+  SANDBOX_KILL_REASON_CLEAN = 1;         // Task completed; orderly shutdown
+  SANDBOX_KILL_REASON_TTL = 2;           // 1h absolute TTL elapsed
+  SANDBOX_KILL_REASON_ESCAPE_ATTEMPT = 3;// Sandbox-escape detected; T18/T19/T20 from threat-model.md
+  SANDBOX_KILL_REASON_BUDGET = 4;        // ADR-009 hard cap breached
+  SANDBOX_KILL_REASON_MANUAL = 5;        // Operator or user requested
+  SANDBOX_KILL_REASON_PROVIDER_FAILURE = 6;  // E2B / Firecracker host died under us
+  SANDBOX_KILL_REASON_HEARTBEAT_LOST = 7; // No /work/.crucible heartbeat for >30s
+  SANDBOX_KILL_REASON_DESTRUCTIVE_DENIED = 8; // Real-scoped destructive proposal rejected
+}
+
+// SandboxResources is the resource envelope for a single sandbox. Defaults
+// are tuned for the median coding-agent task (lean compiler workload).
+message SandboxResources {
+  uint32 vcpus = 1;                      // default 2
+  uint32 memory_mb = 2;                  // default 4096
+  uint32 disk_gb = 3;                    // default 8
+  bool require_gpu = 4;                  // routes to Modal if true (v2 feature)
+  string gpu_kind = 5;                   // "a10" | "a100" | "h100" — informational
+}
+
+// EgressRule is one entry in the per-task egress allowlist. The runtime
+// projects this onto the actual enforcement mechanism: Cilium/Tetragon
+// TracingPolicy on production, mitmproxy on solo-founder tier.
+message EgressRule {
+  // host is the FQDN or CIDR (e.g. "api.stripe.com" or "10.0.0.0/24"). FQDN
+  // form requires DNS resolution at runtime; CIDR form is enforced directly.
+  string host = 1;
+  // ports lists the allowed TCP ports. Empty = all ports for this host.
+  repeated uint32 ports = 2;
+  // direction; presently TCP only — UDP / ICMP are out of scope.
+  Direction direction = 3;
+  // disposition: ALLOW routes to live; SCRUB routes through PII-scrub proxy
+  // (default for live external services); JOURNAL records the call but never
+  // forwards (used for mutation-class endpoints not on tape).
+  Disposition disposition = 4;
+  // tape_only: never live-call this host even if other rules would allow.
+  bool tape_only = 5;
+  // justification: free-text reason this host is on the manifest. Surfaced
+  // in attestation review.
+  string justification = 6;
+
+  enum Direction {
+    DIRECTION_UNSPECIFIED = 0;
+    DIRECTION_EGRESS = 1;
+  }
+  enum Disposition {
+    DISPOSITION_UNSPECIFIED = 0;
+    DISPOSITION_ALLOW = 1;
+    DISPOSITION_SCRUB = 2;
+    DISPOSITION_JOURNAL = 3;
+  }
+}
+
+// EgressManifest is the full set of egress rules for a sandbox. Built from
+// the task manifest at task-spawn time and frozen for the sandbox's lifetime.
+message EgressManifest {
+  repeated EgressRule rules = 1;
+  // default_action when no rule matches: DENY (default) or SCRUB_PASSTHROUGH.
+  DefaultAction default_action = 2;
+  // hash of the canonical manifest representation; included in attestations
+  // so any post-hoc change is detectable.
+  string manifest_hash = 3;
+
+  enum DefaultAction {
+    DEFAULT_ACTION_UNSPECIFIED = 0;
+    DEFAULT_ACTION_DENY = 1;
+    DEFAULT_ACTION_SCRUB_PASSTHROUGH = 2;
+  }
+}
+
+// SecretBinding declares one secret the sandbox may request via twin.secret.get.
+// Bindings name the secret; values are never embedded — the secrets sidecar
+// mints a dynamic, twin-scoped token at the moment of first use.
+message SecretBinding {
+  string name = 1;                        // logical name agent uses
+  string vault_path = 2;                  // path in Infisical (or override vault)
+  string scope_kind = 3;                  // "static" | "dynamic-pg" | "dynamic-mysql" | ...
+  google.protobuf.Duration ttl = 4;       // sub-minute for dynamic; informational for static
+  bool egress_inject_only = 5;            // true = value never leaves egress proxy; false = sidecar may return ref
+}
+
+// DbBranchSpec describes the database twin layer. Per ADR-005 the v1 default
+// is Neon for Postgres; per Phase-2 research we now know Neon is async-create
+// (current_state="init") and the driver must poll an operations endpoint.
+message DbBranchSpec {
+  // engine selects the driver: "postgres-neon" | "postgres-xata" | "postgres-dblab"
+  // | "postgres-aurora" | "mysql-planetscale" | "sqlite-turso" | "mongo-atlas".
+  // Engines not listed return ERROR_CODE_TWIN_SETUP_ERROR with a STUB hint
+  // pointing at the relevant Phase 3 ticket.
+  string engine = 1;
+  // base_branch is the parent of the per-task branch ("twin-base" by default,
+  // which is itself a scrubbed daily snapshot of prod).
+  string base_branch = 2;
+  // parent_lsn pins the parent to a specific LSN for deterministic clones.
+  // Empty = HEAD-of-parent at create time. Recommended: pin to avoid race
+  // with parent migration (per Phase-2 Neon currency-check).
+  string parent_lsn = 3;
+  // ttl after which the runtime auto-deletes the branch. Defaults to the
+  // task wall-clock budget + 15 min grace.
+  google.protobuf.Duration ttl = 4;
+  // protected: branch is treated as read-only by the twin (used for
+  // verifier-only tasks that should not mutate). Defaults to false.
+  bool protected = 5;
+}
+
+// FilesystemSpec describes the filesystem twin layer.
+message FilesystemSpec {
+  // base_sha is the git revision the worktree is pinned to.
+  string base_sha = 1;
+  // repo_url is the source repo to clone into the worktree.
+  string repo_url = 2;
+  // depth for the shallow clone; 1 is enough for most tasks.
+  uint32 depth = 3;
+  // overlay_mode: "overlayfs-linux" | "copy" | "bind-ro" — overlayfs is the
+  // production default; copy is the cross-platform fallback for dev hosts
+  // without overlayfs support.
+  string overlay_mode = 4;
+  // prewarm_paths is a list of paths to materialise into the overlay upper
+  // before the agent starts (e.g. node_modules, .cargo). Each entry is a
+  // tarball reference or registry URI.
+  repeated string prewarm_paths = 5;
+}
+
+// TapeSpec describes the service twin layer.
+message TapeSpec {
+  // tape_set is the content-addressed identifier of the tape bundle the
+  // sandbox mounts read-only at /work/tapes.
+  string tape_set = 1;
+  // mode per tape-coverage-strategy.md: "strict" | "hybrid" | "adaptive".
+  string mode = 2;
+  // synth_engine: "none" | "schema" | "schema+llm".
+  string synth_engine = 3;
+  // mutation_policy: "journal" (write-side mutations stored in in-memory
+  // state journal) | "block" (return 599 to agent).
+  string mutation_policy = 4;
+  // miss_status: HTTP status returned on fail-closed miss. Default 599.
+  uint32 miss_status = 5;
+  // allow_live_hosts is the optional subset of EgressManifest hosts on
+  // which live passthrough is permitted (versus tape-only).
+  repeated string allow_live_hosts = 6;
+}
+
+// SyscallShimPolicy describes the destructive-op gate behaviour. Per the
+// threat model the three layers (command-line parse, ptrace, eBPF) are all
+// active by default; gate_mode controls how each layer reacts.
+message SyscallShimPolicy {
+  // Layers active in this sandbox. Empty list = all three layers active
+  // (the production default).
+  repeated string active_layers = 1;     // "cmd-line-parse" | "ptrace" | "ebpf"
+  // gate_mode: "intercept" (default — convert to DestructiveProposal),
+  // "block" (kill the offending process), "audit-only" (record only;
+  // never used in prod, dev only).
+  string gate_mode = 2;
+  // auto_approve_twin_scope: when true, destructive ops whose blast_radius
+  // resolves entirely inside the twin (e.g. rm in the overlay upper) are
+  // auto-approved by the gate. Per threat-model: real-scoped destructives
+  // ALWAYS require human approval via the Promotion Contract.
+  bool auto_approve_twin_scope = 3;
+  // adversarial_test_mode: when true, the shim records every interception
+  // to a structured corpus used by the property-test harness. Off in prod.
+  bool adversarial_test_mode = 4;
+}
+
+// HeartbeatSpec is how the runtime detects sandbox-loss. The sandbox writes
+// to /work/.crucible/heartbeat at interval_sec; the runtime kills it if
+// no heartbeat seen for stale_after_sec.
+message HeartbeatSpec {
+  uint32 interval_sec = 1;               // default 5
+  uint32 stale_after_sec = 2;            // default 30
+}
+
+// SandboxSpec is the full specification the runtime needs to spawn a twin.
+// It is content-addressed via spec_hash so the same spec always yields the
+// same sandbox (modulo provider non-determinism).
+message SandboxSpec {
+  string task_id = 1;
+  string tenant_id = 2;
+  SandboxKind kind = 3;
+  string provider_region = 4;            // e.g. "aws-us-east-1" — per provider
+  SandboxResources resources = 5;
+  EgressManifest egress = 6;
+  repeated SecretBinding secrets = 7;
+  DbBranchSpec db = 8;                   // optional — empty if task has no DB
+  FilesystemSpec filesystem = 9;
+  TapeSpec tape = 10;                    // optional — empty if no service twin
+  SyscallShimPolicy shim = 11;
+  HeartbeatSpec heartbeat = 12;
+  google.protobuf.Duration absolute_ttl = 13;  // default 1h per ADR-015
+  string spec_hash = 14;                 // hex sha256 of the canonicalised spec
+  // labels for routing / observability — not security-bearing.
+  map<string, string> labels = 15;
+}
+
+// Sandbox is the running instance handle. Returned by Spawn / Restore.
+message Sandbox {
+  string sandbox_id = 1;                 // runtime-assigned, unique per spawn
+  string task_id = 2;
+  string tenant_id = 3;
+  SandboxKind kind = 4;
+  string provider_handle = 5;            // E2B sandbox_id, Firecracker socket path, etc.
+  string control_endpoint = 6;           // unix:/work/.crucible/control.sock or vsock URI
+  google.protobuf.Timestamp spawned_at = 7;
+  google.protobuf.Timestamp expires_at = 8;
+  // state advances forward only; once TERMINATED the sandbox cannot resume.
+  State state = 9;
+  // attestation_socket is the path inside the sandbox the agent SDK writes
+  // attestation envelopes to.
+  string attestation_socket = 10;
+  // spec_hash echoes the spec the sandbox was spawned from.
+  string spec_hash = 11;
+
+  enum State {
+    STATE_UNSPECIFIED = 0;
+    STATE_PROVISIONING = 1;              // resources reserved, not yet booted
+    STATE_BOOTING = 2;                   // VM booting / language runtime warming
+    STATE_READY = 3;                     // agent SDK handle is live
+    STATE_PAUSED = 4;                    // mid-snapshot
+    STATE_TERMINATING = 5;               // kill initiated, not yet acked
+    STATE_TERMINATED = 6;                // resources released; only metadata remains
+    STATE_FAILED = 7;                    // boot failed; never reached READY
+  }
+}
+
+// SnapshotRef points at a captured-state snapshot from which Restore can
+// re-spawn a sandbox. Snapshots are taken at checkpoint boundaries
+// (post-plan, post-tier-0, post-tier-1) per twin-runtime.md, so the agent
+// can fan-out-and-explore without re-running setup.
+message SnapshotRef {
+  string snapshot_id = 1;
+  string sandbox_id = 2;                 // source sandbox
+  string task_id = 3;
+  string name = 4;                       // semantic checkpoint name
+  google.protobuf.Timestamp taken_at = 5;
+  string provider_handle = 6;            // e.g. E2B snapshot ID
+  uint64 size_bytes = 7;                 // best-effort estimate
+  // base_spec_hash links the snapshot to the SandboxSpec it was taken from;
+  // Restore verifies the requested SandboxSpec is compatible.
+  string base_spec_hash = 8;
+  // attestation_chain_head is the rekor UUID of the last attestation emitted
+  // before the snapshot. A Restore continues the chain from this head.
+  string attestation_chain_head = 9;
+}
+
+// KillRequest / KillResponse for the TwinRuntimeService.
+message KillRequest {
+  string sandbox_id = 1;
+  SandboxKillReason reason = 2;
+  string operator_oidc_subject = 3;      // populated for MANUAL kills
+  string note = 4;
+}
+message KillResponse {
+  string sandbox_id = 1;
+  google.protobuf.Timestamp killed_at = 2;
+  SandboxKillReason actual_reason = 3;   // may differ from request if a stronger reason fired during kill
+  // final_attestation is the rekor UUID of the SandboxLifecycle/v1 attestation
+  // emitted at kill time. Always populated, even on PROVIDER_FAILURE kills,
+  // so the chain has a terminator.
+  string final_attestation = 4;
+}
+
+// SpawnRequest / SpawnResponse.
+message SpawnRequest {
+  SandboxSpec spec = 1;
+}
+message SpawnResponse {
+  Sandbox sandbox = 1;
+}
+
+// SnapshotRequest / SnapshotResponse.
+message SnapshotRequest {
+  string sandbox_id = 1;
+  string name = 2;
+  // pause_during_snapshot: true → agent process is SIGSTOP'd for the duration.
+  // Per ADR-015 Firecracker snapshot-restore is 3–10ms once warm so the pause
+  // is imperceptible; we set this true by default to ensure a consistent FS.
+  bool pause_during_snapshot = 3;
+}
+message SnapshotResponse {
+  SnapshotRef snapshot = 1;
+}
+
+// RestoreRequest / RestoreResponse.
+message RestoreRequest {
+  SnapshotRef snapshot = 1;
+  // new_task_id binds the restored sandbox to a different task (used for
+  // fan-out exploration where each forked exploration is its own task).
+  string new_task_id = 2;
+  // override_spec optionally adjusts resources / egress / shim policy on the
+  // restored sandbox. Must produce a spec_hash that's COMPATIBLE with the
+  // snapshot's base_spec_hash (same engine versions, same kernel features);
+  // RestoreResponse returns ERROR_CODE_TWIN_SETUP_ERROR otherwise.
+  SandboxSpec override_spec = 3;
+}
+message RestoreResponse {
+  Sandbox sandbox = 1;
+}
+
+// HeartbeatRequest is sent by the agent SDK every HeartbeatSpec.interval_sec.
+// Stops the runtime's "no-heartbeat" timer from killing the sandbox.
+message HeartbeatRequest {
+  string sandbox_id = 1;
+  google.protobuf.Timestamp sent_at = 2;
+  // optional shallow status fields surfaced in the runtime control plane.
+  uint32 inflight_attestations = 3;
+  string last_action = 4;
+}
+message HeartbeatResponse {
+  google.protobuf.Timestamp received_at = 1;
+  google.protobuf.Duration drift = 2;
+}
+
+// SandboxList is used by the GC daemon to reconcile provider state against
+// the runtime's authoritative ledger. Orphan sandboxes (provider-side but
+// not in ledger) are killed; ledger-side but not provider are removed.
+message ListSandboxesRequest {
+  string tenant_id = 1;                  // optional filter
+  Sandbox.State state = 2;               // optional filter
+}
+message ListSandboxesResponse {
+  repeated Sandbox sandboxes = 1;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// TwinRuntimeService is what the control plane calls. It is the front door
+// to the runtime; the AgentSdkService (in agent_sdk.proto) is what the agent
+// inside the sandbox calls.
+//
+// All RPCs are unary except StreamEvents which is server-streaming.
+// ─────────────────────────────────────────────────────────────────────────────
+service TwinRuntimeService {
+  rpc Spawn(SpawnRequest) returns (SpawnResponse);
+  rpc Snapshot(SnapshotRequest) returns (SnapshotResponse);
+  rpc Restore(RestoreRequest) returns (RestoreResponse);
+  rpc Kill(KillRequest) returns (KillResponse);
+  rpc ListSandboxes(ListSandboxesRequest) returns (ListSandboxesResponse);
+  rpc Heartbeat(HeartbeatRequest) returns (HeartbeatResponse);
+  rpc StreamEvents(StreamEventsRequest) returns (stream RuntimeEvent);
+  rpc HealthCheck(HealthCheckRequest) returns (HealthCheckResponse);
+}
+
+message StreamEventsRequest {
+  string tenant_id = 1;                  // optional filter
+  string task_id = 2;                    // optional filter
+  google.protobuf.Timestamp since = 3;   // resume cursor for re-attach
+}
+
+// RuntimeEvent is the union of lifecycle notifications + security events.
+// Consumed by the control plane to update task state, by the cost meter to
+// charge correctly, and by the security observer to fire RB-03/RB-04 alerts.
+message RuntimeEvent {
+  google.protobuf.Timestamp at = 1;
+  string sandbox_id = 2;
+  string task_id = 3;
+  string tenant_id = 4;
+  oneof event {
+    SandboxStateChange state_change = 5;
+    HeartbeatLost heartbeat_lost = 6;
+    DestructiveIntercepted destructive_intercepted = 7;
+    EgressViolation egress_violation = 8;
+    AttestationEmitted attestation_emitted = 9;
+    ResourceExceeded resource_exceeded = 10;
+    SnapshotTaken snapshot_taken = 11;
+    SandboxKilled sandbox_killed = 12;
+  }
+}
+
+message SandboxStateChange {
+  Sandbox.State from = 1;
+  Sandbox.State to = 2;
+}
+message HeartbeatLost {
+  google.protobuf.Duration silent_for = 1;
+}
+message DestructiveIntercepted {
+  DestructiveProposal proposal = 1;
+  string intercepted_at_layer = 2;       // "cmd-line-parse" | "ptrace" | "ebpf"
+  bool auto_approved = 3;
+}
+message EgressViolation {
+  string attempted_host = 1;
+  uint32 attempted_port = 2;
+  string offending_pid = 3;               // process inside the sandbox
+  // outcome: "killed" (Tetragon SIGKILL fired), "dropped" (mitmproxy returned 599),
+  // "audit-only" (dev mode only — never in prod).
+  string outcome = 4;
+}
+message AttestationEmitted {
+  string rekor_uuid = 1;
+  string predicate_type = 2;
+  string subject = 3;
+}
+message ResourceExceeded {
+  // resource: "cpu" | "memory" | "disk" | "wall-clock" | "cost-usd"
+  string resource = 1;
+  double current = 2;
+  double cap = 3;
+}
+message SnapshotTaken {
+  SnapshotRef snapshot = 1;
+}
+message SandboxKilled {
+  SandboxKillReason reason = 1;
+  // final_attestation echoes KillResponse.final_attestation for stream
+  // consumers reconstructing chains without correlating to the RPC return.
+  string final_attestation = 2;
+}
+
+message HealthCheckRequest {}
+message HealthCheckResponse {
+  bool healthy = 1;
+  string version = 2;
+  google.protobuf.Timestamp started_at = 3;
+  // per-subsystem health: "sandbox_provider", "db_driver", "tape_driver",
+  // "secrets_sidecar", "egress_enforcer", "attestation_publisher".
+  map<string, Subsystem> subsystems = 4;
+
+  message Subsystem {
+    bool healthy = 1;
+    string detail = 2;
+  }
+}

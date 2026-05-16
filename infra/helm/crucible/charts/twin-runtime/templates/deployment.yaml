@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: crucible-twin-runtime
+  namespace: {{ .Release.Namespace }}
+spec:
+  replicas: {{ .Values.replicas }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: twin-runtime
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: twin-runtime
+    spec:
+      containers:
+        - name: twin-runtime
+          image: "{{ .Values.global.imageRegistry }}/{{ .Values.image.name }}:{{ .Values.global.imageTag }}"
+          ports:
+            - { name: grpc, containerPort: {{ .Values.service.port }} }
+          env:
+            - name: CRUCIBLE_TWIN_LISTEN
+              value: "0.0.0.0:{{ .Values.service.port }}"
+            - name: CRUCIBLE_SCRUBBER_URL
+              value: "http://crucible-tape-scrubber.{{ .Release.Namespace }}.svc:9100"
+            - name: CRUCIBLE_E2B_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.crucible.twinRuntime.e2bApiKeySecret }}
+                  key: api-key
+                  optional: true
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          # Twin runtime needs CAP_NET_ADMIN/CAP_SYS_ADMIN when running
+          # the self-host Firecracker driver. We gate that behind a
+          # privileged-pool node selector in the values; the default
+          # SaaS-on-VPC variant uses E2B and runs unprivileged.
+{{- if eq .Values.crucible.twinRuntime.sandboxProvider "firecracker-local" }}
+          securityContext:
+            capabilities:
+              add: ["NET_ADMIN", "SYS_ADMIN"]
+{{- end }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: crucible-twin-runtime
+  namespace: {{ .Release.Namespace }}
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/component: twin-runtime
+  ports:
+    - { port: {{ .Values.service.port }}, targetPort: grpc, name: grpc }

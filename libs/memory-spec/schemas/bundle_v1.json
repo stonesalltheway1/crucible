@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://crucible.dev/memory/Bundle/v1",
+  "title": "PerStackBundle",
+  "description": "Per-stack default bundle produced by infra/oss-corpus-bootstrap. One file per stack lives at services/memory-router/global_defaults/<stack>.json. Loaded at fresh-tenant install.",
+  "type": "object",
+  "required": ["bundle_version", "stack", "generated_at", "license", "conventions"],
+  "properties": {
+    "bundle_version": {
+      "type": "string",
+      "description": "Stack-bundle schema version. Bumping requires a v2 sibling file; loader reads both.",
+      "const": "1"
+    },
+    "stack": {
+      "type": "string",
+      "enum": [
+        "nextjs", "django", "fastapi", "flask", "rails",
+        "spring_boot", "go_services", "rust_services", "phoenix_elixir",
+        "vue", "express", "laravel"
+      ]
+    },
+    "generated_at": { "type": "string", "format": "date-time" },
+    "generator_commit": { "type": "string" },
+    "license": {
+      "type": "object",
+      "required": ["safe_for_redistribution"],
+      "properties": {
+        "safe_for_redistribution": { "type": "boolean" },
+        "input_licenses_seen": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "excluded_licenses": {
+          "type": "array",
+          "description": "GPL/AGPL/SSPL/BUSL inputs we refused to ingest.",
+          "items": { "type": "string" }
+        },
+        "attribution_file": {
+          "type": "string",
+          "description": "Path to THIRD_PARTY_SOURCES.md."
+        }
+      }
+    },
+    "stats": {
+      "type": "object",
+      "properties": {
+        "repos_examined":      { "type": "integer" },
+        "configs_parsed":      { "type": "integer" },
+        "agents_md_parsed":    { "type": "integer" },
+        "pr_comments_mined":   { "type": "integer" },
+        "adrs_parsed":         { "type": "integer" },
+        "raw_candidates":      { "type": "integer" },
+        "post_judge":          { "type": "integer" },
+        "post_agreement":      { "type": "integer" },
+        "active_rules":        { "type": "integer" },
+        "suggested_rules":     { "type": "integer" },
+        "candidate_rules":     { "type": "integer" }
+      }
+    },
+    "conventions": {
+      "type": "array",
+      "items": { "$ref": "https://crucible.dev/memory/Convention/v1" }
+    }
+  },
+  "additionalProperties": false
+}

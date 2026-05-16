@@ -1,0 +1,24 @@
+[package]
+name = "twin-runtime-proto"
+description = "tonic-generated proto types for the Crucible Twin Runtime"
+version = { workspace = true }
+edition = { workspace = true }
+rust-version = { workspace = true }
+license = { workspace = true }
+repository = { workspace = true }
+
+[lib]
+path = "src/lib.rs"
+
+[dependencies]
+tonic = { workspace = true }
+prost = { workspace = true }
+prost-types = { workspace = true }
+serde = { workspace = true }
+chrono = { workspace = true }
+
+[build-dependencies]
+tonic-build = { workspace = true }
+
+[lints]
+workspace = true

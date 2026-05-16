@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://crucible.dev/MigrationAttestation/v1",
+  "title": "MigrationAttestation",
+  "type": "object",
+  "required": ["task_id", "tenant_id", "migration_file", "migration_sha256", "schema_diff", "applied_at", "agent_oidc_subject"],
+  "properties": {
+    "task_id":             { "type": "string" },
+    "tenant_id":           { "type": "string" },
+    "migration_file":      { "type": "string" },
+    "migration_sha256":    { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "schema_diff": {
+      "type": "object",
+      "required": ["added_tables", "modified_tables", "dropped_tables", "added_columns", "destructive_ddl"],
+      "properties": {
+        "added_tables":     { "type": "array", "items": { "type": "string" } },
+        "modified_tables":  { "type": "array", "items": { "type": "string" } },
+        "dropped_tables":   { "type": "array", "items": { "type": "string" } },
+        "added_columns":    { "type": "array", "items": { "type": "string" } },
+        "destructive_ddl":  { "type": "boolean" }
+      },
+      "additionalProperties": false
+    },
+    "row_count_change":    { "type": "object", "additionalProperties": { "type": "string" } },
+    "applied_at":          { "type": "string", "format": "date-time" },
+    "neon_branch_id":      { "type": "string" },
+    "agent_oidc_subject":  { "type": "string", "format": "uri" }
+  },
+  "additionalProperties": false
+}

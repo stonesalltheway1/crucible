@@ -1,0 +1,56 @@
+<idea-plugin>
+    <id>dev.crucible.jetbrains</id>
+    <name>Crucible</name>
+    <vendor email="support@crucible.dev" url="https://crucible.dev">Crucible</vendor>
+
+    <description><![CDATA[
+        <p>Evidence-driven AI engineering inside JetBrains IDEs.</p>
+        <p>Submit tasks to Crucible, review the planner's cost preview and risk
+        callouts, approve / amend / reject before any code is written, watch
+        execution stream live, and explore the attestation chain that proves
+        what the agent did.</p>
+        <p>Per ADR-011: integrates with existing JetBrains IDEs via the
+        IntelliJ Platform; does <em>not</em> fork or replace them. Tab-autocomplete
+        and chat panels live in your existing tooling — we surface the trust
+        narrative.</p>
+    ]]></description>
+
+    <depends>com.intellij.modules.platform</depends>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <toolWindow id="Crucible"
+                    icon="/icons/crucible_13.svg"
+                    anchor="right"
+                    factoryClass="dev.crucible.jetbrains.toolwindow.CrucibleToolWindowFactory"/>
+        <statusBarWidgetFactory id="crucibleBudget"
+                                implementation="dev.crucible.jetbrains.statusbar.BudgetWidgetFactory"
+                                order="first"/>
+        <notificationGroup id="Crucible"
+                           displayType="BALLOON"
+                           toolWindowId="Crucible"/>
+        <applicationService serviceImplementation="dev.crucible.jetbrains.client.CrucibleSettings"/>
+        <applicationConfigurable parentId="tools"
+                                 instance="dev.crucible.jetbrains.settings.CrucibleConfigurable"
+                                 displayName="Crucible"/>
+    </extensions>
+
+    <actions>
+        <group id="Crucible.MainMenu" text="Crucible" popup="true">
+            <action id="Crucible.NewTask"
+                    class="dev.crucible.jetbrains.actions.NewTaskAction"
+                    text="New Task..."
+                    description="Submit a new task to Crucible"/>
+            <action id="Crucible.ApprovePlan"
+                    class="dev.crucible.jetbrains.actions.ApprovePlanAction"
+                    text="Approve Plan"
+                    description="Approve the pending plan for the selected task"/>
+            <action id="Crucible.InterruptTask"
+                    class="dev.crucible.jetbrains.actions.InterruptTaskAction"
+                    text="Halt at Next Checkpoint"/>
+            <action id="Crucible.OpenWebConsole"
+                    class="dev.crucible.jetbrains.actions.OpenWebConsoleAction"
+                    text="Open Web Console"/>
+            <add-to-group group-id="ToolsMenu" anchor="last"/>
+        </group>
+    </actions>
+</idea-plugin>

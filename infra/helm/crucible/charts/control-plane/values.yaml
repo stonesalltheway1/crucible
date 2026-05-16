@@ -1,0 +1,15 @@
+enabled: true
+replicas: 3
+image:
+  name: control-plane
+service:
+  port: 8080
+podDisruptionBudget:
+  minAvailable: 2
+resources:
+  requests:
+    cpu: 1000m
+    memory: 2Gi
+  limits:
+    cpu: 4000m
+    memory: 8Gi

@@ -1,0 +1,23 @@
+version: v2
+clean: true
+plugins:
+  - remote: buf.build/protocolbuffers/go
+    out: ../sdk-go/gen
+    opt:
+      - paths=source_relative
+  - remote: buf.build/connectrpc/go
+    out: ../sdk-go/gen
+    opt:
+      - paths=source_relative
+  - remote: buf.build/protocolbuffers/python
+    out: ../sdk-py/crucible_sdk/gen
+  - remote: buf.build/protocolbuffers/pyi
+    out: ../sdk-py/crucible_sdk/gen
+  - remote: buf.build/community/stephenh-ts-proto
+    out: ../sdk-ts/src/gen
+    opt:
+      - outputServices=generic-definitions
+      - useExactTypes=false
+      - esModuleInterop=true
+  - remote: buf.build/community/neoeinstein-prost
+    out: ../sdk-rs/src/gen

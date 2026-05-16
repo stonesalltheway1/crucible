@@ -1,0 +1,21 @@
+id = "crucible"
+name = "Crucible"
+version = "2026.06.0-phase7"
+schema_version = 1
+authors = ["Crucible <support@crucible.dev>"]
+description = "Evidence-driven AI engineering for Zed via ACP — plan approval, attestations, MCP tool surface."
+repository = "https://github.com/crucible/crucible"
+
+[language_servers]
+
+[slash_commands.crucible]
+description = "Submit a Crucible task. Usage: /crucible <description>"
+requires_argument = true
+
+[slash_commands."crucible-approve"]
+description = "Approve the pending plan for the active task."
+requires_argument = false
+
+[slash_commands."crucible-halt"]
+description = "Halt the active task at the next checkpoint."
+requires_argument = false

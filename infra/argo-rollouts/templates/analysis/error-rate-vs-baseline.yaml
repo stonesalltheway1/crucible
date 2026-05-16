@@ -1,0 +1,47 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AnalysisTemplate
+metadata:
+  name: crucible-slo-error-rate-baseline
+  labels:
+    crucible.io/owner: promotion-gate
+spec:
+  args:
+    - name: service-name
+    - name: promotion-id
+    - name: ratio-threshold
+      value: "1.5"
+  metrics:
+    - name: error-rate-ratio
+      interval: 1m
+      count: 5
+      failureLimit: 1
+      successCondition: result[0] < {{args.ratio-threshold}}
+      provider:
+        prometheus:
+          address: http://prometheus.observability.svc.cluster.local:9090
+          query: |
+            (
+              sum(rate(http_requests_total{
+                service="{{args.service-name}}",
+                crucible_promotion_id="{{args.promotion-id}}",
+                status=~"5.."
+              }[5m]))
+              /
+              sum(rate(http_requests_total{
+                service="{{args.service-name}}",
+                crucible_promotion_id="{{args.promotion-id}}"
+              }[5m]))
+            )
+            /
+            (
+              sum(rate(http_requests_total{
+                service="{{args.service-name}}",
+                crucible_promotion_id="baseline",
+                status=~"5.."
+              }[5m]))
+              /
+              sum(rate(http_requests_total{
+                service="{{args.service-name}}",
+                crucible_promotion_id="baseline"
+              }[5m]))
+            )

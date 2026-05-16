@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://crucible.dev/PromotionBundle/v1",
+  "title": "PromotionBundle",
+  "type": "object",
+  "required": ["task_id", "diff_hash", "verifier_approval_attestation", "files_changed", "agent_oidc_subject", "signed_at"],
+  "properties": {
+    "task_id":                       { "type": "string" },
+    "diff_hash":                     { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "verifier_approval_attestation": { "type": "string" },
+    "files_changed": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["path", "action"],
+        "properties": {
+          "path":            { "type": "string" },
+          "action":          { "type": "string", "enum": ["add", "modify", "delete"] },
+          "content_sha256":  { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+        }
+      }
+    },
+    "build_provenance_attestation":  { "type": "string" },
+    "rebuild_hash":                  { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "blast_radius": {
+      "type": "object",
+      "required": ["affected_resources", "reversibility", "impact_score"],
+      "properties": {
+        "affected_resources": { "type": "array", "items": { "type": "string" } },
+        "reversibility":      { "type": "string", "enum": ["trivial", "snapshot", "lossy", "irreversible"] },
+        "impact_score":       { "type": "number", "minimum": 0, "maximum": 1 }
+      }
+    },
+    "suggested_rollout":             { "type": "object" },
+    "agent_oidc_subject":            { "type": "string", "format": "uri" },
+    "signed_at":                     { "type": "string", "format": "date-time" }
+  },
+  "additionalProperties": false
+}

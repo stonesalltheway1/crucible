@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: crucible-tape-scrubber
+  namespace: {{ .Release.Namespace }}
+spec:
+  replicas: {{ .Values.replicas }}
+  selector: { matchLabels: { app.kubernetes.io/component: tape-scrubber } }
+  template:
+    metadata: { labels: { app.kubernetes.io/component: tape-scrubber } }
+    spec:
+      containers:
+        - name: tape-scrubber
+          image: "{{ .Values.global.imageRegistry }}/{{ .Values.image.name }}:{{ .Values.global.imageTag }}"
+          ports: [{ name: http, containerPort: {{ .Values.service.port }} }]
+          env:
+            - name: CRUCIBLE_SCRUBBER_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.crucible.tapeScrubber.tokenSecret }}
+                  key: token
+            - name: CRUCIBLE_SCRUBBER_FF3_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.crucible.tapeScrubber.ff3MasterKeySecret }}
+                  key: key
+            - { name: CRUCIBLE_SCRUBBER_ENGINE, value: "{{ .Values.crucible.tapeScrubber.engine }}" }
+          resources: {{ toYaml .Values.resources | nindent 12 }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: crucible-tape-scrubber
+  namespace: {{ .Release.Namespace }}
+spec:
+  selector: { app.kubernetes.io/component: tape-scrubber }
+  ports: [{ port: {{ .Values.service.port }}, targetPort: http, name: http }]

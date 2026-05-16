@@ -1,0 +1,53 @@
+{
+  "uid": "crucible-memory",
+  "title": "Crucible — Memory / learning",
+  "tags": ["crucible", "kpi", "memory"],
+  "schemaVersion": 39,
+  "time": { "from": "now-7d", "to": "now" },
+  "panels": [
+    {
+      "title": "Procedural memory writes per tenant per day",
+      "type": "timeseries",
+      "datasource": { "type": "prometheus" },
+      "gridPos": { "x": 0, "y": 0, "w": 12, "h": 6 },
+      "targets": [{ "expr": "sum by (tenant_id) (increase(crucible_memory_writes_total[1d]))" }]
+    },
+    {
+      "title": "Convention drift detections per tenant per week",
+      "type": "timeseries",
+      "datasource": { "type": "prometheus" },
+      "gridPos": { "x": 12, "y": 0, "w": 12, "h": 6 },
+      "targets": [{ "expr": "sum by (tenant_id) (increase(crucible_convention_drift_total[7d]))" }]
+    },
+    {
+      "title": "Memory retrieval router p95 latency (ms) — target < 100",
+      "type": "timeseries",
+      "datasource": { "type": "prometheus" },
+      "gridPos": { "x": 0, "y": 6, "w": 12, "h": 6 },
+      "targets": [{ "expr": "histogram_quantile(0.95, sum(rate(crucible_memory_router_latency_ms_bucket[5m])) by (le))" }]
+    },
+    {
+      "title": "Memory retrieval token-budget overruns — target < 1%",
+      "type": "timeseries",
+      "datasource": { "type": "prometheus" },
+      "gridPos": { "x": 12, "y": 6, "w": 12, "h": 6 },
+      "targets": [{ "expr": "rate(crucible_memory_token_overruns_total[5m]) / rate(crucible_memory_router_calls_total[5m])" }]
+    },
+    {
+      "title": "Cross-tenant abstraction graduations per week",
+      "type": "stat",
+      "datasource": { "type": "prometheus" },
+      "gridPos": { "x": 0, "y": 12, "w": 24, "h": 5 },
+      "targets": [{ "expr": "sum(increase(crucible_memory_graduations_total[7d]))" }]
+    },
+    {
+      "title": "Tape coverage % per tenant (Phase-8 shadow recorder)",
+      "type": "timeseries",
+      "datasource": { "type": "prometheus" },
+      "gridPos": { "x": 0, "y": 17, "w": 24, "h": 6 },
+      "targets": [
+        { "expr": "sum by (tenant_id, host) (crucible_shadow_captures_total)" }
+      ]
+    }
+  ]
+}

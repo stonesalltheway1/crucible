@@ -1,0 +1,15 @@
+{
+  "description": "Add an idempotency-key check to an existing Stripe webhook handler.",
+  "stack": "go-services",
+  "task_description": "The repo has /webhooks/stripe handling charge.refunded events. Add an idempotency-key check that gates the handler on the `Stripe-Idempotency-Key` header, persisting the key to a `stripe_idempotency_keys` table for 24 hours. Existing migration tooling is goose. Verify against the existing Hoverfly tape suite.",
+  "budget_usd_max": 2.50,
+  "wall_clock_min_max": 15,
+  "expect_verifier_verdict": "approved",
+  "assert_git_diff": [
+    { "path": "api/webhooks/stripe.go", "touched": true },
+    { "path": "db/migrations/*", "touched": true },
+    { "path": "vendor/**", "not_touched": true }
+  ],
+  "assert_no_security_incidents": true,
+  "expect_cache_hit_rate_min": 0.55
+}

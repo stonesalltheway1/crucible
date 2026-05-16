@@ -1,0 +1,91 @@
+syntax = "proto3";
+
+package crucible.v1;
+
+import "google/protobuf/timestamp.proto";
+import "crucible/v1/common.proto";
+import "crucible/v1/memory.proto";
+import "crucible/v1/memory_layer.proto";
+
+option go_package = "github.com/crucible/memory-spec/gen/crucible/v1;memoryv1";
+
+// CartographerJob is the once-per-repo onboarding run.
+// Runs inside the customer's own infrastructure boundary — never leaks
+// repo contents off-tenant.
+message CartographerJob {
+  string id = 1;                     // carto_<ulid>
+  string tenant_id = 2;
+  string repo = 3;
+  string repo_local_path = 4;        // on the cartographer's filesystem
+  string stack_hint = 5;             // "nextjs"|"fastapi"|... or "" for auto-detect
+  bool include_pr_history = 6;
+  uint32 pr_history_months = 7;      // default 24
+  uint32 pr_history_max_comments = 8; // default 1000
+  google.protobuf.Timestamp enqueued_at = 9;
+}
+
+// DetectedStack is what the cartographer recognised from package manifests
+// + tree-sitter symbol density.
+message DetectedStack {
+  string primary = 1;                // "nextjs"|"fastapi"|"django"|...
+  repeated string secondary = 2;     // co-located stacks in a monorepo
+  map<string, string> versions = 3;  // {"nextjs": "14.2.4", ...}
+  double confidence = 4;
+}
+
+// RepoScanResult is the cartographer's structured output.
+message RepoScanResult {
+  string job_id = 1;
+  uint32 files_indexed = 2;
+  uint32 directories = 3;
+  DetectedStack stack = 4;
+
+  uint32 conventions_from_configs = 5;     // deterministic lint configs
+  uint32 conventions_from_agents_md = 6;
+  uint32 conventions_from_contributing = 7;
+  uint32 conventions_from_adrs = 8;
+  uint32 conventions_from_pr_review = 9;
+  uint32 conventions_from_oss_defaults = 10;
+
+  uint32 high_confidence_count = 11;       // >= 0.7
+  uint32 medium_confidence_count = 12;     // 0.4..0.7
+  uint32 low_confidence_count = 13;        // < 0.4 (candidate bucket)
+
+  // Inline a sample of admitted conventions for UI display. The full set
+  // is materialised into pgvector + FalkorDB before this result is
+  // returned.
+  repeated Convention sample = 14;
+
+  google.protobuf.Timestamp started_at = 15;
+  google.protobuf.Timestamp completed_at = 16;
+  uint32 wall_clock_seconds = 17;
+  double cartographer_cost_usd = 18;       // absorbed by Crucible, not billed
+
+  // True if the cartographer found a customer-supplied AGENTS.md /
+  // CLAUDE.md / .cursorrules at repo root. These ALWAYS win at retrieval.
+  bool has_customer_override = 19;
+  string customer_override_path = 20;
+}
+
+// InferredAgentsMd is the cartographer's generated AGENTS.md proposal for
+// repos that don't already have one. Customer reviews and edits in the
+// web console; edits are persisted as repo_overrides.
+message InferredAgentsMd {
+  string job_id = 1;
+  string tenant_id = 2;
+  string repo = 3;
+  string content_markdown = 4;
+  uint32 rule_count = 5;
+  string source_summary = 6;         // "{configs:N, AGENTS.md:N, ADR:N, PR:N, OSS:N}"
+  google.protobuf.Timestamp generated_at = 7;
+}
+
+// CartographerProgress is the periodic progress event surfaced to the
+// onboarding UI (Stage 2: Cartography from docs/04-operations/onboarding.md).
+message CartographerProgress {
+  string job_id = 1;
+  string stage = 2;                  // "indexing"|"configs"|"agents_md"|"prs"|"oss"|"merging"|"done"
+  uint32 percent = 3;
+  string message = 4;
+  google.protobuf.Timestamp at = 5;
+}

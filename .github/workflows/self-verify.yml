@@ -1,0 +1,65 @@
+name: crucible-self-verify
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+  pull-requests: write
+  id-token: write
+  attestations: write
+
+# Crucible's own PRs run through Crucible. This is the brand-trust
+# capstone: we eat our own dogfood demonstrably. Per the Phase-8
+# brief and docs/02-engineering/testing-strategy.md §"Self-verification".
+#
+# When the PR/branch lands a verifier-rejection, the workflow blocks
+# merge with the verifier's structured rejection comment.
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: { fetch-depth: 0 }
+
+      - name: Submit PR to deployed Crucible verifier
+        env:
+          CRUCIBLE_API_ADDR: ${{ secrets.CRUCIBLE_VERIFIER_URL }}
+          CRUCIBLE_API_TOKEN: ${{ secrets.CRUCIBLE_VERIFIER_TOKEN }}
+          PR_BASE: ${{ github.event.pull_request.base.sha }}
+          PR_HEAD: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          ./scripts/self-verify-pr.sh \
+              --base "$PR_BASE" --head "$PR_HEAD" \
+              --output verify-result.json
+
+      - name: Comment verifier verdict on PR
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const result = JSON.parse(fs.readFileSync('verify-result.json', 'utf8'));
+            const body = [
+              `## Crucible self-verification`,
+              ``,
+              `**Verdict:** ${result.verdict}`,
+              `**Rubric score:** ${result.rubric_score}`,
+              `**Tier 0 mutation kill rate:** ${result.tier0_kill_rate}`,
+              ``,
+              result.notes ? `### Notes\n\n${result.notes}` : '',
+            ].join('\n');
+            await github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body
+            });
+
+      - name: Fail if verifier rejected
+        run: |
+          jq -e '.verdict == "approved"' verify-result.json

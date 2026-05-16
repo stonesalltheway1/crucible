@@ -1,0 +1,58 @@
+{
+  "uid": "crucible-safety",
+  "title": "Crucible — Safety / trust",
+  "tags": ["crucible", "kpi", "safety"],
+  "schemaVersion": 39,
+  "time": { "from": "now-24h", "to": "now" },
+  "panels": [
+    {
+      "title": "Egress policy violations — target 0",
+      "type": "stat",
+      "datasource": { "type": "prometheus" },
+      "gridPos": { "x": 0, "y": 0, "w": 8, "h": 5 },
+      "targets": [{ "expr": "increase(crucible_security_egress_violations_total[24h])" }],
+      "fieldConfig": { "defaults": { "thresholds": { "steps": [
+        { "value": null, "color": "green" },
+        { "value": 1, "color": "red" }
+      ] } } }
+    },
+    {
+      "title": "Sandbox escape attempts — target 0",
+      "type": "stat",
+      "datasource": { "type": "prometheus" },
+      "gridPos": { "x": 8, "y": 0, "w": 8, "h": 5 },
+      "targets": [{ "expr": "increase(crucible_security_sandbox_escapes_total[24h])" }]
+    },
+    {
+      "title": "Cross-tenant access attempts — target 0",
+      "type": "stat",
+      "datasource": { "type": "prometheus" },
+      "gridPos": { "x": 16, "y": 0, "w": 8, "h": 5 },
+      "targets": [{ "expr": "increase(crucible_security_cross_tenant_total[24h])" }]
+    },
+    {
+      "title": "Sigstore Rekor publish failures — target 0",
+      "type": "timeseries",
+      "datasource": { "type": "prometheus" },
+      "gridPos": { "x": 0, "y": 5, "w": 12, "h": 6 },
+      "targets": [{ "expr": "rate(crucible_attestation_publish_failures_total[5m])" }]
+    },
+    {
+      "title": "KMS signing failures — target 0",
+      "type": "timeseries",
+      "datasource": { "type": "prometheus" },
+      "gridPos": { "x": 12, "y": 5, "w": 12, "h": 6 },
+      "targets": [{ "expr": "rate(crucible_kms_signing_failures_total[5m])" }]
+    },
+    {
+      "title": "Destructive-op gate firings (informational)",
+      "type": "timeseries",
+      "datasource": { "type": "prometheus" },
+      "gridPos": { "x": 0, "y": 11, "w": 24, "h": 6 },
+      "targets": [
+        { "expr": "rate(crucible_destructive_op_gate_total{scope=\"twin\"}[5m])", "legendFormat": "twin (auto-approved)" },
+        { "expr": "rate(crucible_destructive_op_gate_total{scope=\"real\"}[5m])", "legendFormat": "real (approval required)" }
+      ]
+    }
+  ]
+}

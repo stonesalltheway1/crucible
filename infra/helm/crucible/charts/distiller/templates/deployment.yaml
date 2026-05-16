@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: crucible-distiller
+  namespace: {{ .Release.Namespace }}
+spec:
+  replicas: {{ .Values.replicas }}
+  selector: { matchLabels: { app.kubernetes.io/component: distiller } }
+  template:
+    metadata: { labels: { app.kubernetes.io/component: distiller } }
+    spec:
+      containers:
+        - name: distiller
+          image: "{{ .Values.global.imageRegistry }}/{{ .Values.image.name }}:{{ .Values.global.imageTag }}"
+          ports: [{ name: http, containerPort: {{ .Values.service.port }} }]
+          env:
+            - { name: CRUCIBLE_DISTILLER_LISTEN, value: ":{{ .Values.service.port }}" }
+            - { name: CRUCIBLE_MEMORY_ROUTER_ADDR, value: "http://crucible-memory-router.{{ .Release.Namespace }}.svc:8090" }
+          resources: {{ toYaml .Values.resources | nindent 12 }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: crucible-distiller
+  namespace: {{ .Release.Namespace }}
+spec:
+  selector: { app.kubernetes.io/component: distiller }
+  ports: [{ port: {{ .Values.service.port }}, targetPort: http, name: http }]

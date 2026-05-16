@@ -1,0 +1,104 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: crucible-control-plane
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/component: control-plane
+spec:
+  replicas: {{ .Values.replicas }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: control-plane
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/component: control-plane
+    spec:
+      serviceAccountName: crucible
+      automountServiceAccountToken: true
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65534
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: control-plane
+          image: "{{ .Values.global.imageRegistry }}/{{ .Values.image.name }}:{{ .Values.global.imageTag }}"
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.port }}
+              protocol: TCP
+          env:
+            - name: CRUCIBLE_LISTEN_ADDR
+              value: ":{{ .Values.service.port }}"
+            - name: CRUCIBLE_PROMOTION_GATE_ADDR
+              value: "http://crucible-promotion-gate.{{ .Release.Namespace }}.svc:9180"
+            - name: CRUCIBLE_VERIFIER_ADDR
+              value: "http://crucible-verifier.{{ .Release.Namespace }}.svc:9080"
+            - name: CRUCIBLE_TWIN_RUNTIME_ADDR
+              value: "crucible-twin-runtime.{{ .Release.Namespace }}.svc:7444"
+            - name: CRUCIBLE_MEMORY_ROUTER_ADDR
+              value: "http://crucible-memory-router.{{ .Release.Namespace }}.svc:8090"
+            - name: CRUCIBLE_CARTOGRAPHER_ADDR
+              value: "http://crucible-cartographer.{{ .Release.Namespace }}.svc:9420"
+            - name: ANTHROPIC_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.crucible.llmRouting.apiKeysSecret }}
+                  key: anthropic
+                  optional: true
+            - name: GOOGLE_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.crucible.llmRouting.apiKeysSecret }}
+                  key: google
+                  optional: true
+            - name: STRIPE_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Values.crucible.billing.secretKeyRef.name }}
+                  key: {{ .Values.crucible.billing.secretKeyRef.key }}
+                  optional: true
+          livenessProbe:
+            httpGet: { path: /healthz, port: http }
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          readinessProbe:
+            httpGet: { path: /healthz, port: http }
+            initialDelaySeconds: 5
+            periodSeconds: 5
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: crucible-control-plane
+  namespace: {{ .Release.Namespace }}
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/component: control-plane
+  ports:
+    - port: {{ .Values.service.port }}
+      targetPort: http
+      protocol: TCP
+      name: http
+---
+apiVersion: policy/v1
+kind: PodDisruptionBudget
+metadata:
+  name: crucible-control-plane
+  namespace: {{ .Release.Namespace }}
+spec:
+  minAvailable: {{ .Values.podDisruptionBudget.minAvailable }}
+  selector:
+    matchLabels:
+      app.kubernetes.io/component: control-plane

@@ -1,0 +1,6 @@
+apiVersion: v2
+name: memory-router
+description: Crucible memory-router (hot-path procedural memory retrieval, Go).
+type: application
+version: 2026.6.0
+appVersion: "2026.06.0"

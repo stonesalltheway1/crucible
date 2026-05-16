@@ -1,0 +1,24 @@
+{
+  "$schema": "https://crucible.dev/schemas/slo-query/v1",
+  "_comment": "Provider-neutral SLO queries the gate's outcome_watcher executes when the delivery strategy is feature-flag-only. Same intent as the Argo Rollouts AnalysisTemplate library.",
+  "queries": [
+    {
+      "name": "error-rate",
+      "promql": "sum(rate(http_requests_total{service=\"<service>\",crucible_promotion_id=\"<promotion-id>\",status=~\"5..\"}[5m])) / sum(rate(http_requests_total{service=\"<service>\",crucible_promotion_id=\"<promotion-id>\"}[5m]))",
+      "threshold": 0.005,
+      "comparator": "<"
+    },
+    {
+      "name": "latency-p95",
+      "promql": "histogram_quantile(0.95, sum(rate(http_request_duration_milliseconds_bucket{service=\"<service>\",crucible_promotion_id=\"<promotion-id>\"}[5m])) by (le))",
+      "threshold_multiplier_vs_baseline": 1.3,
+      "comparator": "<"
+    },
+    {
+      "name": "saturation",
+      "promql": "max(rate(process_cpu_seconds_total{service=\"<service>\",crucible_promotion_id=\"<promotion-id>\"}[5m]))",
+      "threshold": 0.8,
+      "comparator": "<"
+    }
+  ]
+}

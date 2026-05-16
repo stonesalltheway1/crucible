@@ -1,0 +1,12 @@
+{
+  "description": "Replace every moment.js usage with date-fns equivalents.",
+  "stack": "nextjs",
+  "task_description": "The repo has 47 moment.js usages across 22 files. Replace each with date-fns equivalents preserving timezone semantics. Run the existing time-zone test suite to confirm no regression. Convention from AGENTS.md: 'Use date-fns; don't introduce moment.js'.",
+  "budget_usd_max": 3.50,
+  "wall_clock_min_max": 28,
+  "expect_verifier_verdict": "approved",
+  "assert_git_diff": [
+    { "path": "**/*.{ts,tsx,js,jsx}", "must_not_contain": ["import moment"] }
+  ],
+  "assert_no_security_incidents": true
+}

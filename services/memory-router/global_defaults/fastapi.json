@@ -1,0 +1,235 @@
+{
+  "bundle_version": "1",
+  "stack": "fastapi",
+  "generated_at": "2026-05-15T20:10:06.813407Z",
+  "generator_commit": "",
+  "license": {
+    "safe_for_redistribution": true,
+    "input_licenses_seen": [
+      "Apache-2.0",
+      "MIT",
+      "Public Domain"
+    ],
+    "excluded_licenses": [],
+    "attribution_file": "THIRD_PARTY_SOURCES.md"
+  },
+  "stats": {
+    "repos_examined": 200,
+    "configs_parsed": 120,
+    "agents_md_parsed": 80,
+    "pr_comments_mined": 0,
+    "adrs_parsed": 0,
+    "raw_candidates": 36,
+    "post_judge": 12,
+    "post_agreement": 12,
+    "active_rules": 12,
+    "suggested_rules": 0,
+    "candidate_rules": 0
+  },
+  "conventions": [
+    {
+      "id": "conv_global_fastapi_e57f1864965d4251",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "**/*.py"
+      },
+      "rule_nl": "Pydantic models use PascalCase; instances use snake_case.",
+      "category": "Naming",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.813407Z",
+      "written_at": "2026-05-15T20:10:06.813407Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.813407Z",
+      "stack_tag": "fastapi"
+    },
+    {
+      "id": "conv_global_fastapi_cdf093090c30487b",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "app/**/*.py"
+      },
+      "rule_nl": "Domain layer cannot import from `api/`.",
+      "category": "Layering",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.813407Z",
+      "written_at": "2026-05-15T20:10:06.813407Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.813407Z",
+      "stack_tag": "fastapi"
+    },
+    {
+      "id": "conv_global_fastapi_4a1749b3155544ea",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "app/api/**/*.py"
+      },
+      "rule_nl": "Use `pydantic` v2 idioms; avoid raw dict response models.",
+      "category": "LibraryPreferences",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.813407Z",
+      "written_at": "2026-05-15T20:10:06.813407Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.813407Z",
+      "stack_tag": "fastapi"
+    },
+    {
+      "id": "conv_global_fastapi_a83aff5bd64e4ac9",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "tests/**/*.py"
+      },
+      "rule_nl": "Tests live in `tests/` mirroring the package layout.",
+      "category": "TestPatterns",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.813407Z",
+      "written_at": "2026-05-15T20:10:06.813407Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.813407Z",
+      "stack_tag": "fastapi"
+    },
+    {
+      "id": "conv_global_fastapi_e4946d24a7d24c80",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "app/**/*.py"
+      },
+      "rule_nl": "Use `HTTPException` for 4xx; structured Result types internally.",
+      "category": "ErrorHandling",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.813407Z",
+      "written_at": "2026-05-15T20:10:06.813407Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.813407Z",
+      "stack_tag": "fastapi"
+    },
+    {
+      "id": "conv_global_fastapi_8680f12192e54bb0",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "app/**/*.py"
+      },
+      "rule_nl": "Structured logs via `structlog`; no print() in service code.",
+      "category": "Logging",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.813407Z",
+      "written_at": "2026-05-15T20:10:06.813407Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.813407Z",
+      "stack_tag": "fastapi"
+    },
+    {
+      "id": "conv_global_fastapi_a9360ad2594b4e18",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "alembic/versions/**/*.py"
+      },
+      "rule_nl": "Alembic migrations are additive-only with `op.execute` guard rails.",
+      "category": "MigrationPatterns",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.813407Z",
+      "written_at": "2026-05-15T20:10:06.813407Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.813407Z",
+      "stack_tag": "fastapi"
+    },
+    {
+      "id": "conv_global_fastapi_a664ce82069540ff",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "*"
+      },
+      "rule_nl": "Black-formatted; ruff-clean; Conventional Commits.",
+      "category": "PrCommitHygiene",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.813407Z",
+      "written_at": "2026-05-15T20:10:06.813407Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.813407Z",
+      "stack_tag": "fastapi"
+    },
+    {
+      "id": "conv_global_fastapi_81c35cee01334007",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "app/api/**/*.py"
+      },
+      "rule_nl": "Authentication dependency precedes route handlers.",
+      "category": "SecurityDefaults",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.813407Z",
+      "written_at": "2026-05-15T20:10:06.813407Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.813407Z",
+      "stack_tag": "fastapi"
+    },
+    {
+      "id": "conv_global_fastapi_812bcc19ef6c4905",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "app/**/*.py"
+      },
+      "rule_nl": "Use `select_related`/`asyncio.gather` to avoid N+1.",
+      "category": "PerformanceDefaults",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.813407Z",
+      "written_at": "2026-05-15T20:10:06.813407Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.813407Z",
+      "stack_tag": "fastapi"
+    },
+    {
+      "id": "conv_global_fastapi_671c043096534782",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "app/**/*.py"
+      },
+      "rule_nl": "Pass `asyncio` contextvars through async chains.",
+      "category": "Concurrency",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.813407Z",
+      "written_at": "2026-05-15T20:10:06.813407Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.813407Z",
+      "stack_tag": "fastapi"
+    },
+    {
+      "id": "conv_global_fastapi_de6d18dd6040498f",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "app/api/**/*.py"
+      },
+      "rule_nl": "OpenAPI tags + response_model are mandatory on each route.",
+      "category": "ApiShape",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.813407Z",
+      "written_at": "2026-05-15T20:10:06.813407Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.813407Z",
+      "stack_tag": "fastapi"
+    }
+  ]
+}

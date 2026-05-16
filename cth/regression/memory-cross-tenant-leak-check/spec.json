@@ -1,0 +1,9 @@
+{
+  "description": "Regression — the memory router's per-tenant RLS once leaked between tenants under specific embedding-search load.",
+  "stack": "go-services",
+  "task_description": "Pre-populate two tenants' memory with overlapping conventions. Issue 50K cross-tenant retrieval queries and assert ZERO leaks: tenant A's queries return only tenant A's conventions + the global defaults. Failure = P0 isolation breach.",
+  "budget_usd_max": 0.20,
+  "wall_clock_min_max": 8,
+  "expect_verifier_verdict": "approved",
+  "assert_no_security_incidents": true
+}

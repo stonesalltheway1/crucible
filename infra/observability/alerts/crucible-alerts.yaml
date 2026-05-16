@@ -1,0 +1,142 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: crucible-alerts
+  namespace: observability
+  labels:
+    app.kubernetes.io/part-of: crucible
+spec:
+  groups:
+    - name: crucible.rb01-economics
+      rules:
+        - alert: CrucibleCacheHitDroppedRB01
+          expr: |
+            (sum(rate(crucible_tokens_cached_total[30m]))
+             / (sum(rate(crucible_tokens_fresh_total[30m])) + sum(rate(crucible_tokens_cached_total[30m])))) < 0.6
+          for: 30m
+          labels: { severity: warning, runbook: RB-01 }
+          annotations:
+            summary: "Cache hit rate dropped below 60% for 30m"
+            runbook_url: "https://docs.crucible.dev/04-operations/runbooks#rb-01-cache-hit-rate-dropped"
+        - alert: CrucibleCacheHitCriticalRB01
+          expr: |
+            (sum(rate(crucible_tokens_cached_total[30m]))
+             / (sum(rate(crucible_tokens_fresh_total[30m])) + sum(rate(crucible_tokens_cached_total[30m])))) < 0.5
+          for: 30m
+          labels: { severity: critical, runbook: RB-01 }
+          annotations:
+            summary: "Cache hit rate < 50% for 30 min — page on-call"
+        - alert: CrucibleMedianTaskCostExceededRB02
+          expr: histogram_quantile(0.5, sum(rate(crucible_task_cost_usd_bucket[1h])) by (le)) > 2.5
+          for: 1h
+          labels: { severity: warning, runbook: RB-02 }
+          annotations: { summary: "Median task cost > $2.50 sustained 1h" }
+
+    - name: crucible.rb03-egress
+      rules:
+        - alert: CrucibleEgressViolationRB03
+          expr: increase(crucible_security_egress_violations_total[5m]) > 0
+          for: 0m
+          labels: { severity: critical, runbook: RB-03 }
+          annotations: { summary: "Egress policy violation — page security on-call" }
+
+    - name: crucible.rb04-sandbox
+      rules:
+        - alert: CrucibleSandboxEscapeAttemptRB04
+          expr: increase(crucible_security_sandbox_escapes_total[5m]) > 0
+          for: 0m
+          labels: { severity: critical, runbook: RB-04 }
+          annotations: { summary: "Sandbox escape attempt — P0 incident" }
+
+    - name: crucible.rb05-rekor
+      rules:
+        - alert: CrucibleRekorPublishFailingRB05
+          expr: rate(crucible_attestation_publish_failures_total[5m]) > 0.01
+          for: 5m
+          labels: { severity: warning, runbook: RB-05 }
+          annotations: { summary: "Sigstore Rekor publish-failure rate > 1% for 5 min" }
+
+    - name: crucible.rb06-kms
+      rules:
+        - alert: CrucibleKMSSigningFailureRB06
+          expr: rate(crucible_kms_signing_failures_total[5m]) > 0.01
+          for: 5m
+          labels: { severity: warning, runbook: RB-06 }
+          annotations: { summary: "KMS signing API error rate > 1% for 5 min" }
+
+    - name: crucible.rb07-disagreement
+      rules:
+        - alert: CrucibleVerifierDisagreementRB07
+          expr: |
+            (rate(crucible_verifier_human_disagreement_total[24h])
+             / rate(crucible_verifier_decisions_total[24h])) > 0.25
+          for: 24h
+          labels: { severity: warning, runbook: RB-07 }
+          annotations: { summary: "Verifier disagrees with human > 25% over 24h" }
+
+    - name: crucible.rb08-cross-tenant
+      rules:
+        - alert: CrucibleCrossTenantAccessRB08
+          expr: increase(crucible_security_cross_tenant_total[5m]) > 0
+          for: 0m
+          labels: { severity: critical, runbook: RB-08 }
+          annotations: { summary: "Cross-tenant access attempt — page CTO + security + CEO" }
+
+    - name: crucible.rb09-twin
+      rules:
+        - alert: CrucibleTwinSpawnFailureRB09
+          expr: rate(crucible_twin_spawn_failures_total[10m]) > 0.02
+          for: 10m
+          labels: { severity: warning, runbook: RB-09 }
+          annotations: { summary: "Twin-runtime spawn failure rate > 2% for 10m" }
+
+    - name: crucible.rb10-tier3
+      rules:
+        - alert: CrucibleTier3TimeoutRateRB10
+          expr: |
+            (rate(crucible_verifier_tier3_timeouts_total[24h])
+             / rate(crucible_verifier_tier3_attempts_total[24h])) > 0.25
+          for: 24h
+          labels: { severity: warning, runbook: RB-10 }
+          annotations: { summary: "Tier 3 proofs timing out > 25% over 24h" }
+
+    - name: crucible.rb11-promotion
+      rules:
+        - alert: CrucibleFalsePromotionApprovalRB11
+          expr: increase(crucible_promotion_false_approval_reports_total[1h]) > 0
+          for: 0m
+          labels: { severity: critical, runbook: RB-11 }
+          annotations: { summary: "Customer-reported false promotion approval — P0" }
+
+    - name: crucible.rb12-drift
+      rules:
+        - alert: CrucibleConventionDriftSpikeRB12
+          expr: |
+            sum by (tenant_id) (increase(crucible_convention_drift_total[7d])) > 10
+          for: 0m
+          labels: { severity: info, runbook: RB-12 }
+          annotations: { summary: "Convention drift spike for tenant" }
+
+    - name: crucible.rb13-vendor
+      rules:
+        - alert: CrucibleVendorDeprecationRB13
+          expr: increase(crucible_vendor_deprecation_announcement_total[1d]) > 0
+          for: 0m
+          labels: { severity: info, runbook: RB-13 }
+          annotations: { summary: "Vendor LLM deprecation announced — update routing" }
+
+    - name: crucible.rb14-llm-outage
+      rules:
+        - alert: CrucibleLLMVendorOutageRB14
+          expr: rate(crucible_llm_vendor_errors_total[5m]) > 0.05
+          for: 5m
+          labels: { severity: critical, runbook: RB-14 }
+          annotations: { summary: "Frontier model API error rate > 5% for 5 min" }
+
+    - name: crucible.rb15-freeze
+      rules:
+        - alert: CrucibleTenantFrozenRB15
+          expr: crucible_tenant_frozen{state="frozen"} == 1
+          for: 0m
+          labels: { severity: info, runbook: RB-15 }
+          annotations: { summary: "Tenant frozen — operator action recorded" }

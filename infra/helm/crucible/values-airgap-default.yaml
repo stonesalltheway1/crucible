@@ -1,0 +1,55 @@
+# Air-gap defaults. Layer this on top of values.yaml.
+#
+# Layout the sub-charts use:
+#   helm install crucible ./infra/helm/crucible \
+#       --values ./infra/helm/crucible/values.yaml \
+#       --values ./infra/helm/crucible/values-airgap-default.yaml
+#
+# Air-gap deployments REQUIRE:
+#   - local OCI registry with the Phase-8 air-gap-bundle pre-loaded
+#     (registry.internal.<customer>.com)
+#   - HSM-backed KMS (no cloud KMS reachable)
+#   - self-hosted Sigstore Rekor + Fulcio
+#   - local LLM weights via vLLM (Llama 4 Scout / DeepSeek V4-Pro /
+#     Qwen3-Coder-Plus)
+#   - billing disabled (air-gap deployments are licensed flat-fee)
+
+global:
+  imageRegistry: registry.internal       # the customer overrides this
+  serviceMonitor:
+    enabled: true
+
+crucible:
+  topology: airgap
+
+  twinRuntime:
+    sandboxProvider: firecracker-local
+
+  kms:
+    provider: yubihsm
+    keyRef: pkcs11://0/crucible-prod
+
+  sigstore:
+    mode: self-hosted
+    rekorUrl: https://rekor.internal
+    fulcioUrl: https://fulcio.internal
+    trustedRoot: /etc/crucible/sigstore-trusted-root.json
+
+  llmRouting:
+    tier0Provider: vllm
+    tier1Provider: vllm
+    tier2Provider: vllm
+    verifierProvider: vllm
+    airgapLocalProvider: vllm
+
+  billing:
+    enabled: false
+
+  networkPolicy:
+    enabled: true
+    egressAllowlist: []   # zero outbound is the goal.
+
+# Air-gap also disables shadow-recorder by default (customer enables
+# explicitly after they wire their staging tap).
+shadow-recorder:
+  enabled: false

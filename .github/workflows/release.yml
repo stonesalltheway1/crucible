@@ -1,0 +1,220 @@
+name: release
+
+on:
+  push:
+    tags: ['v2026.*']
+  workflow_dispatch:
+    inputs:
+      version:
+        description: "Version (e.g. 2026.06.0)"
+        required: true
+        type: string
+
+permissions:
+  contents: write          # publish a GitHub Release
+  id-token: write          # Sigstore keyless OIDC + SLSA attest
+  attestations: write      # actions/attest-build-provenance
+  packages: write          # GHCR
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  # -----------------------------------------------------------------
+  # Stage 0: derive the release version from the tag or workflow input.
+  # -----------------------------------------------------------------
+  meta:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.derive.outputs.version }}
+    steps:
+      - id: derive
+        run: |
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "version=${{ inputs.version }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "version=${GITHUB_REF#refs/tags/v}" >> "$GITHUB_OUTPUT"
+          fi
+
+  # -----------------------------------------------------------------
+  # Stage 1: build every artifact via Nix on TWO independent runners.
+  # The Tier-4 reproducible-build comparison fails the release if hashes diverge.
+  # -----------------------------------------------------------------
+  build:
+    needs: meta
+    strategy:
+      fail-fast: false
+      matrix:
+        builder: [primary, comparator]
+    runs-on: ubuntu-latest
+    outputs:
+      hashes: ${{ steps.hash.outputs.hashes }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: DeterminateSystems/nix-installer-action@main
+      - uses: DeterminateSystems/magic-nix-cache-action@main
+
+      - name: Build all release artifacts
+        run: |
+          mkdir -p dist
+          for target in control-plane cli verifier memory-router distiller \
+                        cartographer shadow-recorder tape-scrubber promotion-gate \
+                        attestation-relay cost-meter web-console github-app slack-bot; do
+            nix build --print-out-paths .#$target -o result-$target
+            cp -L result-$target/bin/* dist/ 2>/dev/null || true
+          done
+
+      - name: Build OCI images
+        run: |
+          mkdir -p dist/images
+          for target in control-plane cli verifier memory-router distiller \
+                        cartographer shadow-recorder tape-scrubber promotion-gate \
+                        attestation-relay cost-meter web-console github-app slack-bot; do
+            nix build --print-out-paths .#oci-$target -o oci-$target || true
+            cp -L oci-$target dist/images/$target.oci 2>/dev/null || true
+          done
+
+      - name: Package Helm chart
+        run: |
+          helm package infra/helm/crucible -d dist/helm
+
+      - name: Compute hashes (for reproducible-build comparison)
+        id: hash
+        run: |
+          ( cd dist && find . -type f -exec sha256sum {} \; | sort > .hashes.txt )
+          echo "hashes=$(sha256sum dist/.hashes.txt | awk '{print $1}')" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dist-${{ matrix.builder }}
+          path: dist/
+
+  # -----------------------------------------------------------------
+  # Stage 2: confirm primary == comparator (Tier-4 reproducible-build gate).
+  # -----------------------------------------------------------------
+  reproducible-check:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with: { name: dist-primary, path: dist-primary }
+      - uses: actions/download-artifact@v4
+        with: { name: dist-comparator, path: dist-comparator }
+      - name: Compare top-level hashes
+        run: |
+          ( cd dist-primary    && find . -type f -exec sha256sum {} \; | sort > /tmp/p.txt )
+          ( cd dist-comparator && find . -type f -exec sha256sum {} \; | sort > /tmp/c.txt )
+          diff /tmp/p.txt /tmp/c.txt
+          echo "✓ Reproducible build confirmed (2 of 2 builders bit-identical)"
+
+  # -----------------------------------------------------------------
+  # Stage 3: SLSA-L3 attestations (signed via Sigstore keyless OIDC).
+  # -----------------------------------------------------------------
+  attest:
+    needs: reproducible-check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with: { name: dist-primary, path: dist }
+      - name: SLSA build provenance — binaries
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-path: 'dist/*'
+      - name: SLSA build provenance — OCI images
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-path: 'dist/images/*.oci'
+      - name: SLSA build provenance — Helm chart
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-path: 'dist/helm/*.tgz'
+
+  # -----------------------------------------------------------------
+  # Stage 4: build + sign the air-gap bundle.
+  # -----------------------------------------------------------------
+  airgap:
+    needs: [attest, meta]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with: { name: dist-primary, path: dist }
+      - name: Build air-gap bundle
+        run: |
+          ./infra/air-gap-bundle/scripts/build-bundle.sh \
+              --version "${{ needs.meta.outputs.version }}" \
+              --out "dist/crucible-airgap-bundle-${{ needs.meta.outputs.version }}.tar.gz"
+      - name: Sign + SLSA-attest air-gap bundle
+        uses: actions/attest-build-provenance@v2
+        with:
+          subject-path: 'dist/crucible-airgap-bundle-*.tar.gz'
+      - uses: actions/upload-artifact@v4
+        with: { name: airgap, path: dist/crucible-airgap-bundle-*.tar.gz }
+
+  # -----------------------------------------------------------------
+  # Stage 5: Crucible-self-verification — we run our own Tier 0–4
+  # ladder on this release before tagging it. NON-OPTIONAL — see the
+  # GUARDRAILS in docs/08-phase-prompts/phase-08-onboarding-and-v1-launch.md.
+  # -----------------------------------------------------------------
+  self-verify:
+    needs: [airgap, meta]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with: { name: airgap, path: dist }
+      - name: Run Crucible verifier on this release
+        env:
+          CRUCIBLE_API_ADDR: ${{ secrets.CRUCIBLE_RELEASE_VERIFIER_URL }}
+          CRUCIBLE_API_TOKEN: ${{ secrets.CRUCIBLE_RELEASE_VERIFIER_TOKEN }}
+        run: |
+          ./scripts/self-verify-release.sh \
+              --version "${{ needs.meta.outputs.version }}" \
+              --bundle "dist/crucible-airgap-bundle-${{ needs.meta.outputs.version }}.tar.gz"
+      - name: Crucible Test Harness (CTH)
+        run: |
+          ./cth/scripts/run-all.sh \
+              --release "${{ needs.meta.outputs.version }}" \
+              --output-dir cth-results
+
+  # -----------------------------------------------------------------
+  # Stage 6: publish — GHCR, GitHub Release, customer-portal.
+  # -----------------------------------------------------------------
+  publish:
+    needs: self-verify
+    runs-on: ubuntu-latest
+    environment: production-release
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with: { name: dist-primary, path: dist }
+      - uses: actions/download-artifact@v4
+        with: { name: airgap, path: dist }
+      - name: Push images to GHCR
+        run: |
+          for img in dist/images/*.oci; do
+            crane push "$img" "ghcr.io/crucible/$(basename "$img" .oci):${{ needs.meta.outputs.version }}"
+          done
+      - name: Publish Helm chart
+        run: |
+          helm push dist/helm/crucible-*.tgz oci://ghcr.io/crucible/charts
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ needs.meta.outputs.version }}
+          generate_release_notes: true
+          files: |
+            dist/*
+            dist/images/*.oci
+            dist/helm/*.tgz
+            dist/crucible-airgap-bundle-*.tar.gz
+      - name: Upload air-gap bundle to customer-portal signed-distribution
+        env:
+          PORTAL_TOKEN: ${{ secrets.PORTAL_UPLOAD_TOKEN }}
+        run: |
+          curl --fail -X POST \
+              -H "Authorization: Bearer $PORTAL_TOKEN" \
+              -F "version=${{ needs.meta.outputs.version }}" \
+              -F "file=@dist/crucible-airgap-bundle-${{ needs.meta.outputs.version }}.tar.gz" \
+              "https://portal.crucible.dev/api/v1/airgap-bundles/upload"

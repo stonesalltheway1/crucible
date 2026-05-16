@@ -1,0 +1,9 @@
+{
+  "description": "Extract a notifications service from a Django monolith into its own bounded module.",
+  "stack": "django",
+  "task_description": "The monolith has notification logic spread across users/, orders/, and core/. Extract a notifications/ Django app with a clean boundary: imports go users → notifications, never the reverse. Existing tests must continue passing; layering rule from AGENTS.md is enforced (db cannot import from web).",
+  "budget_usd_max": 4.50,
+  "wall_clock_min_max": 35,
+  "expect_verifier_verdict": "approved",
+  "assert_no_security_incidents": true
+}

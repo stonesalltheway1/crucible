@@ -1,0 +1,7 @@
+enabled: true
+replicas: 2
+image: { name: cost-meter }
+service: { port: 9220 }
+resources:
+  requests: { cpu: 500m, memory: 512Mi }
+  limits:   { cpu: 2000m, memory: 2Gi }

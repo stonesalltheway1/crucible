@@ -1,0 +1,10 @@
+{
+  "description": "Fix a known split-brain bug in a leader-election implementation; Tier 3 TLA+ verifies the fix.",
+  "stack": "go-services",
+  "task_description": "The repo has a buggy leader-election that allows two leaders briefly during partition heal. Diagnose the cause and fix the algorithm. Tier 3 (TLA+) MUST verify the safety invariant 'at most one leader at any time'.",
+  "budget_usd_max": 7.00,
+  "wall_clock_min_max": 50,
+  "expect_verifier_verdict": "approved",
+  "expect_tier3_triggered": true,
+  "assert_no_security_incidents": true
+}

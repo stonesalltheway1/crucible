@@ -1,0 +1,30 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: crucible-promotion-gate
+  namespace: {{ .Release.Namespace }}
+spec:
+  replicas: {{ .Values.replicas }}
+  selector: { matchLabels: { app.kubernetes.io/component: promotion-gate } }
+  template:
+    metadata: { labels: { app.kubernetes.io/component: promotion-gate } }
+    spec:
+      containers:
+        - name: promotion-gate
+          image: "{{ .Values.global.imageRegistry }}/{{ .Values.image.name }}:{{ .Values.global.imageTag }}"
+          ports: [{ name: http, containerPort: {{ .Values.service.port }} }]
+          env:
+            - { name: CRUCIBLE_GATE_LISTEN, value: ":{{ .Values.service.port }}" }
+            - { name: CRUCIBLE_RELAY_ADDR, value: "http://crucible-attestation-relay.{{ .Release.Namespace }}.svc:9120" }
+            - { name: CRUCIBLE_KMS_PROVIDER, value: "{{ .Values.crucible.kms.provider }}" }
+            - { name: CRUCIBLE_KMS_KEY_ARN, value: "{{ .Values.crucible.kms.keyRef }}" }
+          resources: {{ toYaml .Values.resources | nindent 12 }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: crucible-promotion-gate
+  namespace: {{ .Release.Namespace }}
+spec:
+  selector: { app.kubernetes.io/component: promotion-gate }
+  ports: [{ port: {{ .Values.service.port }}, targetPort: http, name: http }]

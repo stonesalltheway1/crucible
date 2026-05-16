@@ -1,0 +1,235 @@
+{
+  "bundle_version": "1",
+  "stack": "nextjs",
+  "generated_at": "2026-05-15T20:10:06.810693Z",
+  "generator_commit": "",
+  "license": {
+    "safe_for_redistribution": true,
+    "input_licenses_seen": [
+      "Apache-2.0",
+      "CC-BY-4.0",
+      "MIT"
+    ],
+    "excluded_licenses": [],
+    "attribution_file": "THIRD_PARTY_SOURCES.md"
+  },
+  "stats": {
+    "repos_examined": 200,
+    "configs_parsed": 120,
+    "agents_md_parsed": 80,
+    "pr_comments_mined": 0,
+    "adrs_parsed": 0,
+    "raw_candidates": 36,
+    "post_judge": 12,
+    "post_agreement": 12,
+    "active_rules": 12,
+    "suggested_rules": 0,
+    "candidate_rules": 0
+  },
+  "conventions": [
+    {
+      "id": "conv_global_nextjs_edd9a42e39c74537",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "**/*.tsx"
+      },
+      "rule_nl": "Component files use PascalCase; hooks use camelCase prefixed with `use`.",
+      "category": "Naming",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.810693Z",
+      "written_at": "2026-05-15T20:10:06.810693Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.810693Z",
+      "stack_tag": "nextjs"
+    },
+    {
+      "id": "conv_global_nextjs_c6bdd81d15794619",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "app/**/*.{ts,tsx}"
+      },
+      "rule_nl": "Server-only modules import only from `lib/server/**`.",
+      "category": "Layering",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.810693Z",
+      "written_at": "2026-05-15T20:10:06.810693Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.810693Z",
+      "stack_tag": "nextjs"
+    },
+    {
+      "id": "conv_global_nextjs_53eb786052bb4a07",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "**/*.{ts,tsx,js}"
+      },
+      "rule_nl": "Use `date-fns` for date handling; don't introduce `moment`.",
+      "category": "LibraryPreferences",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.810693Z",
+      "written_at": "2026-05-15T20:10:06.810693Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.810693Z",
+      "stack_tag": "nextjs"
+    },
+    {
+      "id": "conv_global_nextjs_5df448ef655a4e52",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "**/*.{ts,tsx}"
+      },
+      "rule_nl": "Tests colocate with source in `__tests__/`.",
+      "category": "TestPatterns",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.810693Z",
+      "written_at": "2026-05-15T20:10:06.810693Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.810693Z",
+      "stack_tag": "nextjs"
+    },
+    {
+      "id": "conv_global_nextjs_e6c3a8b9120e4850",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "app/api/**/*.ts"
+      },
+      "rule_nl": "API routes return `Response.json({ error: { code, message } })` envelopes.",
+      "category": "ErrorHandling",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.810693Z",
+      "written_at": "2026-05-15T20:10:06.810693Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.810693Z",
+      "stack_tag": "nextjs"
+    },
+    {
+      "id": "conv_global_nextjs_e8965e8702144d09",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "app/**/*.ts"
+      },
+      "rule_nl": "Use a structured logger (pino / winston); no console.log in production code.",
+      "category": "Logging",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.810693Z",
+      "written_at": "2026-05-15T20:10:06.810693Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.810693Z",
+      "stack_tag": "nextjs"
+    },
+    {
+      "id": "conv_global_nextjs_c8c860d727f04e0d",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "db/migrations/**/*.{sql,ts}"
+      },
+      "rule_nl": "Database migrations are additive-only.",
+      "category": "MigrationPatterns",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.810693Z",
+      "written_at": "2026-05-15T20:10:06.810693Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.810693Z",
+      "stack_tag": "nextjs"
+    },
+    {
+      "id": "conv_global_nextjs_beb68044ad3848e9",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "*"
+      },
+      "rule_nl": "Conventional Commits required.",
+      "category": "PrCommitHygiene",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.810693Z",
+      "written_at": "2026-05-15T20:10:06.810693Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.810693Z",
+      "stack_tag": "nextjs"
+    },
+    {
+      "id": "conv_global_nextjs_fe53f51d85e24200",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "app/**/*.ts"
+      },
+      "rule_nl": "Auth middleware precedes any route handler.",
+      "category": "SecurityDefaults",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.810693Z",
+      "written_at": "2026-05-15T20:10:06.810693Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.810693Z",
+      "stack_tag": "nextjs"
+    },
+    {
+      "id": "conv_global_nextjs_6c37ecdbf124436a",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "app/api/**/*.ts"
+      },
+      "rule_nl": "Use cursor pagination; avoid offset.",
+      "category": "PerformanceDefaults",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.810693Z",
+      "written_at": "2026-05-15T20:10:06.810693Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.810693Z",
+      "stack_tag": "nextjs"
+    },
+    {
+      "id": "conv_global_nextjs_0966c8456f614673",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "app/**/*.ts"
+      },
+      "rule_nl": "Pass an AbortSignal through every async chain.",
+      "category": "Concurrency",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.810693Z",
+      "written_at": "2026-05-15T20:10:06.810693Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.810693Z",
+      "stack_tag": "nextjs"
+    },
+    {
+      "id": "conv_global_nextjs_ca3a2c1c992e4908",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "app/api/**/route.ts"
+      },
+      "rule_nl": "Idempotency keys required on mutation endpoints.",
+      "category": "ApiShape",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.810693Z",
+      "written_at": "2026-05-15T20:10:06.810693Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.810693Z",
+      "stack_tag": "nextjs"
+    }
+  ]
+}

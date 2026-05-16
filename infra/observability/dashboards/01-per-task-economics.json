@@ -1,0 +1,90 @@
+{
+  "uid": "crucible-economics",
+  "title": "Crucible — Per-task economics",
+  "tags": ["crucible", "kpi"],
+  "editable": false,
+  "schemaVersion": 39,
+  "timezone": "browser",
+  "time": { "from": "now-24h", "to": "now" },
+  "refresh": "30s",
+  "templating": {
+    "list": [
+      { "name": "tenant", "type": "query", "datasource": { "type": "prometheus" }, "query": "label_values(crucible_task_cost_usd_sum, tenant_id)", "includeAll": true }
+    ]
+  },
+  "panels": [
+    {
+      "title": "Median task cost ($) — target ≤ $1.69",
+      "type": "stat",
+      "datasource": { "type": "prometheus" },
+      "gridPos": { "x": 0, "y": 0, "w": 6, "h": 5 },
+      "targets": [
+        { "expr": "histogram_quantile(0.5, sum(rate(crucible_task_cost_usd_bucket{tenant_id=~\"$tenant\"}[1h])) by (le))" }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "thresholds": { "mode": "absolute", "steps": [
+            { "value": null, "color": "green" },
+            { "value": 1.69, "color": "yellow" },
+            { "value": 2.50, "color": "red" }
+          ] },
+          "unit": "currencyUSD"
+        }
+      }
+    },
+    {
+      "title": "P95 task cost ($) — target ≤ $7.00",
+      "type": "stat",
+      "datasource": { "type": "prometheus" },
+      "gridPos": { "x": 6, "y": 0, "w": 6, "h": 5 },
+      "targets": [
+        { "expr": "histogram_quantile(0.95, sum(rate(crucible_task_cost_usd_bucket{tenant_id=~\"$tenant\"}[1h])) by (le))" }
+      ],
+      "fieldConfig": {
+        "defaults": { "thresholds": { "steps": [
+          { "value": null, "color": "green" },
+          { "value": 7.00, "color": "yellow" },
+          { "value": 12.00, "color": "red" }
+        ] }, "unit": "currencyUSD" }
+      }
+    },
+    {
+      "title": "Cache hit rate — target ≥ 70%",
+      "type": "timeseries",
+      "datasource": { "type": "prometheus" },
+      "gridPos": { "x": 12, "y": 0, "w": 12, "h": 5 },
+      "targets": [
+        { "expr": "sum(rate(crucible_tokens_cached_total{tenant_id=~\"$tenant\"}[5m])) / (sum(rate(crucible_tokens_fresh_total[5m])) + sum(rate(crucible_tokens_cached_total[5m])))" }
+      ],
+      "fieldConfig": { "defaults": { "unit": "percentunit" } }
+    },
+    {
+      "title": "Verifier cost as % of total — target ≤ 10%",
+      "type": "timeseries",
+      "datasource": { "type": "prometheus" },
+      "gridPos": { "x": 0, "y": 5, "w": 12, "h": 6 },
+      "targets": [
+        { "expr": "sum(rate(crucible_task_cost_usd_sum{verifier_role=\"verifier\"}[5m])) / sum(rate(crucible_task_cost_usd_sum[5m]))" }
+      ],
+      "fieldConfig": { "defaults": { "unit": "percentunit" } }
+    },
+    {
+      "title": "Median task wall-clock (min) — target ≤ 15",
+      "type": "timeseries",
+      "datasource": { "type": "prometheus" },
+      "gridPos": { "x": 12, "y": 5, "w": 12, "h": 6 },
+      "targets": [
+        { "expr": "histogram_quantile(0.5, sum(rate(crucible_task_wallclock_seconds_bucket{tenant_id=~\"$tenant\"}[10m])) by (le)) / 60" }
+      ]
+    },
+    {
+      "title": "Token usage per active dev/day — target ≤ 1.5M",
+      "type": "timeseries",
+      "datasource": { "type": "prometheus" },
+      "gridPos": { "x": 0, "y": 11, "w": 24, "h": 6 },
+      "targets": [
+        { "expr": "sum(increase(crucible_tokens_total{tenant_id=~\"$tenant\"}[1d])) / count by (tenant_id)(crucible_active_developers)" }
+      ]
+    }
+  ]
+}

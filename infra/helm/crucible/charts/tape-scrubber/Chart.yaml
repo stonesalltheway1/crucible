@@ -1,0 +1,6 @@
+apiVersion: v2
+name: tape-scrubber
+description: Crucible tape scrubber (Presidio + spaCy + FF3-1 PII pipeline).
+type: application
+version: 2026.6.0
+appVersion: "2026.06.0"

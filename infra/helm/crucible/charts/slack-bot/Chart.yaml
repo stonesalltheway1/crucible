@@ -1,0 +1,6 @@
+apiVersion: v2
+name: slack-bot
+description: Crucible Slack bot (slash commands + DM notifier + approval interactivity).
+type: application
+version: 2026.6.0
+appVersion: "2026.06.0"

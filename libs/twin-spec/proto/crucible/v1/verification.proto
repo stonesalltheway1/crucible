@@ -1,0 +1,122 @@
+syntax = "proto3";
+
+package crucible.v1;
+
+import "google/protobuf/timestamp.proto";
+import "crucible/v1/common.proto";
+
+option go_package = "github.com/crucible/sdk-go/gen/crucible/v1;cruciblev1";
+
+// TierResult is one verifier-pipeline tier's report.
+message TierResult {
+  Tier tier = 1;
+  bool passed = 2;
+  string report_attestation = 3;       // rekor UUID or local journal ID
+  double score = 4;
+  string framework = 5;                // e.g. "stryker-js" | "hypothesis" | "dafny"
+  uint64 duration_seconds = 6;
+  string error = 7;
+
+  enum Tier {
+    TIER_UNSPECIFIED = 0;
+    TIER_0_MUTATION = 1;
+    TIER_1_PBT = 2;
+    TIER_2_CONTRACT = 3;
+    TIER_3_PROOF = 4;
+    TIER_4_HONEST_CI = 5;
+  }
+}
+
+// TierResults is a map from tier -> result for a task.
+message TierResults {
+  TierResult tier_0 = 1;
+  TierResult tier_1 = 2;
+  TierResult tier_2 = 3;
+  TierResult tier_3 = 4;
+  TierResult tier_4 = 5;
+}
+
+// VerifierApproval is the verifier process's signed verdict for a task.
+message VerifierApproval {
+  string task_id = 1;
+  string diff_hash = 2;
+  string verdict = 3;                  // "approved"
+  double rubric_score = 4;
+  TierResults tier_results = 5;
+  string executor_oidc_subject = 6;
+  string verifier_oidc_subject = 7;
+  string executor_model = 8;
+  string verifier_model = 9;
+  google.protobuf.Timestamp signed_at = 10;
+  string attestation_id = 11;
+}
+
+// VerifierRejection is the signed rejection with structured reasons.
+message VerifierRejection {
+  string task_id = 1;
+  string diff_hash = 2;
+  string verdict = 3;                  // "rejected"
+  repeated RejectionReason rejection_reasons = 4;
+  TierResults tier_results = 5;
+  string executor_oidc_subject = 6;
+  string verifier_oidc_subject = 7;
+  google.protobuf.Timestamp signed_at = 8;
+  string attestation_id = 9;
+
+  message RejectionReason {
+    string category = 1;               // "mutation_survived" | "property_failed" | ...
+    string detail = 2;
+    string file = 3;
+    uint32 line = 4;
+    string suggested_fix = 5;
+  }
+}
+
+// PromotionBundle is the bundle submitted to the Promotion Contract.
+message PromotionBundle {
+  string task_id = 1;
+  string diff_hash = 2;
+  string verifier_approval_attestation = 3;
+  repeated FileChange files_changed = 4;
+  string build_provenance_attestation = 5;   // SLSA Provenance v1 ref
+  string rebuild_hash = 6;
+  BlastRadius blast_radius = 7;
+  SuggestedRollout suggested_rollout = 8;
+  string agent_oidc_subject = 9;
+  google.protobuf.Timestamp signed_at = 10;
+  string attestation_id = 11;
+}
+
+message SuggestedRollout {
+  repeated RolloutStep steps = 1;
+  uint32 dwell_seconds_per_step = 2;
+  string slo_check = 3;                // e.g. "p95_latency_ms < 250"
+
+  message RolloutStep {
+    uint32 weight = 1;                 // percent
+    uint32 dwell_seconds = 2;
+  }
+}
+
+message PromotionId {
+  string id = 1;                       // prom_<ulid>
+}
+
+enum PromotionStatusKind {
+  PROMOTION_STATUS_UNSPECIFIED = 0;
+  PROMOTION_STATUS_PENDING_POLICY = 1;
+  PROMOTION_STATUS_PENDING_APPROVAL = 2;
+  PROMOTION_STATUS_APPROVED = 3;
+  PROMOTION_STATUS_DEPLOYING = 4;
+  PROMOTION_STATUS_CANARY_DWELL = 5;
+  PROMOTION_STATUS_LANDED = 6;
+  PROMOTION_STATUS_ROLLED_BACK = 7;
+  PROMOTION_STATUS_REJECTED = 8;
+}
+
+message PromotionStatus {
+  string id = 1;
+  PromotionStatusKind kind = 2;
+  string detail = 3;
+  google.protobuf.Timestamp updated_at = 4;
+}

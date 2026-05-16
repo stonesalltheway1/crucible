@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://crucible.dev/PlanProposal/v1",
+  "title": "PlanProposal",
+  "type": "object",
+  "required": ["task_id", "tenant_id", "plan_hash", "estimated_cost_usd", "estimated_duration_min", "complexity", "step_count", "built_by_oidc", "built_at"],
+  "properties": {
+    "task_id":                 { "type": "string" },
+    "tenant_id":               { "type": "string" },
+    "plan_hash":               { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "estimated_cost_usd":      { "type": "number", "minimum": 0 },
+    "estimated_duration_min":  { "type": "integer", "minimum": 0 },
+    "complexity":              { "type": "string", "enum": ["trivial", "standard", "complex", "critical", "modernization"] },
+    "step_count":              { "type": "integer", "minimum": 0 },
+    "built_by_oidc":           { "type": "string", "format": "uri" },
+    "built_at":                { "type": "string", "format": "date-time" }
+  },
+  "additionalProperties": false
+}

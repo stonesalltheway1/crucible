@@ -1,0 +1,9 @@
+{
+  "description": "Greenfield Django 5 blog with auth-less posts, ruff/black/mypy clean.",
+  "stack": "django",
+  "task_description": "Build a Django 5 blog. Posts have title, body, author. No auth. Include admin pages, pytest tests, ruff + black + mypy clean. Use class-based views per HackSoft style guide. `pytest && ruff check && mypy .` should pass.",
+  "budget_usd_max": 3.50,
+  "wall_clock_min_max": 22,
+  "expect_verifier_verdict": "approved",
+  "assert_no_security_incidents": true
+}

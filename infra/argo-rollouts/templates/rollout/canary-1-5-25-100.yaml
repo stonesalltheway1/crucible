@@ -1,0 +1,81 @@
+# Default canary rollout template — 1% / 5% / 25% / 100% with dwells.
+#
+# The promotion gate's delivery_adapter clones this template, patches the
+# `image`, `annotations[crucible.io/promotion-id]`, the per-step weights
+# from `suggested_rollout.steps`, and the AnalysisTemplate reference from
+# `suggested_rollout.slo_check`, then applies via the Argo Rollouts API.
+
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: crucible-canary-template
+  labels:
+    crucible.io/owner: promotion-gate
+  annotations:
+    crucible.io/promotion-id: REPLACEME
+    crucible.io/bundle-hash: REPLACEME
+    crucible.io/lease-id: REPLACEME
+spec:
+  replicas: 4
+  revisionHistoryLimit: 5
+  strategy:
+    canary:
+      maxSurge: 25%
+      maxUnavailable: 0
+      analysis:
+        templates:
+          - templateName: crucible-slo-error-rate
+        args:
+          - name: service-name
+            value: REPLACEME
+          - name: promotion-id
+            value: REPLACEME
+      steps:
+        - setWeight: 1
+        - pause:
+            duration: 5m
+        - analysis:
+            templates:
+              - templateName: crucible-slo-error-rate
+            args:
+              - name: service-name
+                value: REPLACEME
+              - name: promotion-id
+                value: REPLACEME
+        - setWeight: 5
+        - pause:
+            duration: 10m
+        - analysis:
+            templates:
+              - templateName: crucible-slo-error-rate
+            args:
+              - name: service-name
+                value: REPLACEME
+              - name: promotion-id
+                value: REPLACEME
+        - setWeight: 25
+        - pause:
+            duration: 30m
+        - analysis:
+            templates:
+              - templateName: crucible-slo-error-rate
+            args:
+              - name: service-name
+                value: REPLACEME
+              - name: promotion-id
+                value: REPLACEME
+        - setWeight: 100
+  selector:
+    matchLabels:
+      app: REPLACEME
+  template:
+    metadata:
+      labels:
+        app: REPLACEME
+        crucible.io/promotion-id: REPLACEME
+    spec:
+      containers:
+        - name: app
+          image: REPLACEME
+          ports:
+            - containerPort: 8080

@@ -1,0 +1,12 @@
+# GCP-flavoured overrides.
+crucible:
+  postgres:
+    host: ""              # CloudSQL host or proxy address
+  objectStorage:
+    type: gcs
+    endpoint: storage.googleapis.com
+  kms:
+    provider: gcp-cloud-hsm
+    keyRef: projects/<project>/locations/<region>/keyRings/crucible/cryptoKeys/sign/cryptoKeyVersions/1
+global:
+  storageClass: pd-ssd

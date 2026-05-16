@@ -1,0 +1,69 @@
+apiVersion: v2
+name: crucible
+description: |
+  Crucible — the AI engineer that tests every change in a digital twin
+  before touching real systems. Production-deploy umbrella chart.
+type: application
+version: 2026.6.0
+appVersion: "2026.06.0"
+keywords:
+  - ai-agent
+  - verification
+  - sigstore
+  - slsa
+  - twin
+home: https://crucible.dev
+sources:
+  - https://github.com/crucible/crucible
+maintainers:
+  - name: Crucible Engineering
+    email: engineering@crucible.dev
+icon: https://crucible.dev/icon.png
+annotations:
+  artifacthub.io/category: developer-tools
+  artifacthub.io/license: Apache-2.0
+  artifacthub.io/signKey: |
+    fingerprint: keyless OIDC via Sigstore Cosign
+dependencies:
+  - name: control-plane
+    version: 2026.6.0
+    repository: file://./charts/control-plane
+  - name: twin-runtime
+    version: 2026.6.0
+    repository: file://./charts/twin-runtime
+  - name: verifier
+    version: 2026.6.0
+    repository: file://./charts/verifier
+  - name: memory-router
+    version: 2026.6.0
+    repository: file://./charts/memory-router
+  - name: distiller
+    version: 2026.6.0
+    repository: file://./charts/distiller
+  - name: cartographer
+    version: 2026.6.0
+    repository: file://./charts/cartographer
+  - name: shadow-recorder
+    version: 2026.6.0
+    repository: file://./charts/shadow-recorder
+  - name: tape-scrubber
+    version: 2026.6.0
+    repository: file://./charts/tape-scrubber
+  - name: promotion-gate
+    version: 2026.6.0
+    repository: file://./charts/promotion-gate
+  - name: attestation-relay
+    version: 2026.6.0
+    repository: file://./charts/attestation-relay
+  - name: cost-meter
+    version: 2026.6.0
+    repository: file://./charts/cost-meter
+  - name: web-console
+    version: 2026.6.0
+    repository: file://./charts/web-console
+  - name: github-app
+    version: 2026.6.0
+    repository: file://./charts/github-app
+  - name: slack-bot
+    version: 2026.6.0
+    repository: file://./charts/slack-bot

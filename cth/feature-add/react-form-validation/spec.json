@@ -1,0 +1,9 @@
+{
+  "description": "Add zod-based client + server validation to a React signup form.",
+  "stack": "nextjs",
+  "task_description": "The repo has src/app/signup/page.tsx with a basic form. Add zod schemas for client and server validation: email format, password ≥ 12 chars, matching confirm-password. Server returns structured field errors. Vitest + Playwright tests must pass.",
+  "budget_usd_max": 2.00,
+  "wall_clock_min_max": 14,
+  "expect_verifier_verdict": "approved",
+  "assert_no_security_incidents": true
+}

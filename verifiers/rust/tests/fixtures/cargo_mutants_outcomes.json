@@ -1,0 +1,61 @@
+{
+  "version": "27.0.0",
+  "outcomes": [
+    {
+      "summary": "Caught",
+      "scenario": {
+        "mutant": {
+          "file": "src/lib.rs",
+          "line": 4,
+          "function": "add",
+          "genre": "BinaryOperator",
+          "original": "+",
+          "replacement": "-"
+        }
+      },
+      "phase_results": [
+        { "phase": "build", "duration": 1.2 },
+        { "phase": "test", "duration": 0.8 }
+      ]
+    },
+    {
+      "summary": "Caught",
+      "scenario": {
+        "mutant": {
+          "file": "src/lib.rs",
+          "line": 9,
+          "function": "is_positive",
+          "genre": "BooleanLiteral",
+          "original": "true",
+          "replacement": "false"
+        }
+      }
+    },
+    {
+      "summary": "Missed",
+      "scenario": {
+        "mutant": {
+          "file": "src/lib.rs",
+          "line": 14,
+          "function": "double",
+          "genre": "BinaryOperator",
+          "original": "*",
+          "replacement": "/"
+        }
+      }
+    },
+    {
+      "summary": "Unviable",
+      "scenario": {
+        "mutant": {
+          "file": "src/lib.rs",
+          "line": 20,
+          "function": "noop",
+          "genre": "Erasure",
+          "original": "()",
+          "replacement": "()"
+        }
+      }
+    }
+  ]
+}

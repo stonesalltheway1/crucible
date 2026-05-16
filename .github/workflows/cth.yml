@@ -1,0 +1,64 @@
+name: cth
+
+on:
+  pull_request:
+    paths:
+      - 'apps/**'
+      - 'services/**'
+      - 'libs/**'
+      - 'verifiers/**'
+      - 'cth/**'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  cth-greenfield:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: DeterminateSystems/nix-installer-action@main
+      - uses: DeterminateSystems/magic-nix-cache-action@main
+      - name: Run greenfield CTH cases
+        run: ./cth/scripts/run-category.sh greenfield
+
+  cth-feature-add:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: DeterminateSystems/nix-installer-action@main
+      - name: Run feature-add CTH cases
+        run: ./cth/scripts/run-category.sh feature-add
+
+  cth-refactor:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: DeterminateSystems/nix-installer-action@main
+      - name: Run refactor CTH cases
+        run: ./cth/scripts/run-category.sh refactor
+
+  cth-critical-path:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: DeterminateSystems/nix-installer-action@main
+      - name: Run critical-path CTH cases
+        run: ./cth/scripts/run-category.sh critical-path
+
+  cth-adversarial:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: DeterminateSystems/nix-installer-action@main
+      - name: Run adversarial CTH cases
+        run: ./cth/scripts/run-category.sh adversarial
+
+  cth-regression:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: DeterminateSystems/nix-installer-action@main
+      - name: Run regression CTH cases
+        run: ./cth/scripts/run-category.sh regression

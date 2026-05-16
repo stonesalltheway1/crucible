@@ -1,0 +1,160 @@
+syntax = "proto3";
+
+package crucible.v1;
+
+import "google/protobuf/timestamp.proto";
+import "crucible/v1/common.proto";
+import "crucible/v1/task.proto";
+import "crucible/v1/memory.proto";
+import "crucible/v1/verification.proto";
+
+option go_package = "github.com/crucible/sdk-go/gen/crucible/v1;cruciblev1";
+
+// AgentSdkService is the twin.* surface invoked from inside the agent process.
+// Phase 1 only defines the message types and stubs the RPC implementations
+// in the control plane; the real handlers live in apps/twin-runtime (Phase 2).
+//
+// This service is intentionally placed in twin-spec so all four SDK languages
+// generate identical types and the Phase-2 wiring is a pure server-side fill-in.
+service AgentSdkService {
+  // ── twin.fs ────────────────────────────────────────────────────────────
+  rpc FsRead(FsReadRequest) returns (FsReadResponse);
+  rpc FsWrite(FsWriteRequest) returns (FsWriteResponse);
+  rpc FsDelete(FsDeleteRequest) returns (FsDeleteResponse);
+  rpc FsList(FsListRequest) returns (FsListResponse);
+  rpc FsDiff(FsDiffRequest) returns (FsDiffResponse);
+
+  // ── twin.shell ─────────────────────────────────────────────────────────
+  rpc ShellExec(ShellExecRequest) returns (ShellExecResponse);
+  rpc ShellApproveDestructive(ShellApproveDestructiveRequest) returns (ShellApproveDestructiveResponse);
+
+  // ── twin.memory ────────────────────────────────────────────────────────
+  rpc MemoryRecall(MemoryRecallRequest) returns (MemoryRecallResponse);
+  rpc MemoryNote(MemoryNoteRequest) returns (MemoryNoteResponse);
+  rpc MemoryConventions(MemoryConventionsRequest) returns (MemoryConventionsResponse);
+  rpc MemoryCheckCompliance(MemoryCheckComplianceRequest) returns (MemoryCheckComplianceResponse);
+
+  // ── twin.plan ──────────────────────────────────────────────────────────
+  rpc PlanCheckBudget(PlanCheckBudgetRequest) returns (PlanCheckBudgetResponse);
+  rpc PlanRequestReplan(PlanRequestReplanRequest) returns (PlanRequestReplanResponse);
+}
+
+// ── twin.fs ───────────────────────────────────────────────────────────────
+message FsReadRequest {
+  string task_id = 1;
+  string path = 2;
+}
+message FsReadResponse {
+  string content = 1;
+  string content_sha256 = 2;
+}
+
+message FsWriteRequest {
+  string task_id = 1;
+  string path = 2;
+  string content = 3;
+  string step_id = 4;
+}
+message FsWriteResponse {
+  string attestation_id = 1;
+  string content_sha256 = 2;
+}
+
+message FsDeleteRequest {
+  string task_id = 1;
+  string path = 2;
+  string step_id = 3;
+}
+message FsDeleteResponse {
+  oneof outcome {
+    DestructiveProposal proposal = 1;
+    string attestation_id = 2;
+  }
+}
+
+message FsListRequest {
+  string task_id = 1;
+  Glob glob = 2;
+}
+message FsListResponse {
+  repeated string paths = 1;
+}
+
+message FsDiffRequest {
+  string task_id = 1;
+}
+message FsDiffResponse {
+  Diff diff = 1;
+}
+
+// ── twin.shell ────────────────────────────────────────────────────────────
+message ShellExecRequest {
+  string task_id = 1;
+  string cmd = 2;
+  string cwd = 3;
+  map<string, string> env = 4;
+  uint32 timeout_sec = 5;
+}
+message ShellExecResponse {
+  oneof outcome {
+    ExecResult result = 1;
+    DestructiveProposal proposal = 2;
+  }
+}
+message ShellApproveDestructiveRequest {
+  string task_id = 1;
+  DestructiveProposal proposal = 2;
+  string justification = 3;
+}
+message ShellApproveDestructiveResponse {
+  ExecResult result = 1;
+}
+
+// ── twin.memory ───────────────────────────────────────────────────────────
+message MemoryRecallRequest {
+  string task_id = 1;
+  string query = 2;
+  Scope scope = 3;
+  uint32 max_tokens = 4;               // default 7000
+}
+message MemoryRecallResponse {
+  repeated Memory memories = 1;
+}
+message MemoryNoteRequest {
+  string task_id = 1;
+  string fact = 2;
+  SourceRef source = 3;
+}
+message MemoryNoteResponse {
+  string memory_id = 1;
+  string attestation_id = 2;
+}
+message MemoryConventionsRequest {
+  string tenant_id = 1;
+  Scope scope = 2;
+}
+message MemoryConventionsResponse {
+  repeated Convention conventions = 1;
+}
+message MemoryCheckComplianceRequest {
+  string task_id = 1;
+  Diff diff = 2;
+}
+message MemoryCheckComplianceResponse {
+  ComplianceReport report = 1;
+}
+
+// ── twin.plan ─────────────────────────────────────────────────────────────
+message PlanCheckBudgetRequest {
+  string task_id = 1;
+}
+message PlanCheckBudgetResponse {
+  Budget budget = 1;
+}
+message PlanRequestReplanRequest {
+  string task_id = 1;
+  string reason = 2;
+}
+message PlanRequestReplanResponse {
+  Task task = 1;
+}

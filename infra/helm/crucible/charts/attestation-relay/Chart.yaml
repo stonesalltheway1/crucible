@@ -1,0 +1,6 @@
+apiVersion: v2
+name: attestation-relay
+description: Crucible attestation relay (Rust; Sigstore Rekor v2 publisher).
+type: application
+version: 2026.6.0
+appVersion: "2026.06.0"

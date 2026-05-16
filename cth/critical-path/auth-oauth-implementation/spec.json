@@ -1,0 +1,10 @@
+{
+  "description": "Implement an OAuth 2.0 Authorization Code Flow with PKCE — annotated @critical, requires Tier 3.",
+  "stack": "go-services",
+  "task_description": "Build an OAuth 2.0 Authorization Code Flow with PKCE for the customer's API. Annotate the token-exchange and PKCE-validation functions @critical. The verifier MUST trigger Tier 3 (Dafny proofs that no token can be exchanged twice; no PKCE-bypass).",
+  "budget_usd_max": 6.00,
+  "wall_clock_min_max": 45,
+  "expect_verifier_verdict": "approved",
+  "expect_tier3_triggered": true,
+  "assert_no_security_incidents": true
+}

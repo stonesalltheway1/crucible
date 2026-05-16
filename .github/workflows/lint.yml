@@ -1,0 +1,91 @@
+name: lint
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  go:
+    name: golangci-lint
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        module:
+          - apps/control-plane
+          - apps/cli
+          - libs/sdk-go
+          - libs/attestation
+          - libs/policy
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.23'
+          cache-dependency-path: ${{ matrix.module }}/go.sum
+      - name: gofmt
+        run: |
+          cd ${{ matrix.module }}
+          test -z "$(gofmt -l . 2>&1 | tee /dev/stderr)"
+      - name: vet
+        run: |
+          cd ${{ matrix.module }}
+          go vet ./...
+      - name: golangci-lint
+        uses: golangci/golangci-lint-action@v6
+        with:
+          version: latest
+          working-directory: ${{ matrix.module }}
+          args: --timeout=5m
+
+  ts:
+    name: biome (sdk-ts)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: corepack enable
+      - name: install
+        run: cd libs/sdk-ts && pnpm install --frozen-lockfile || pnpm install
+      - name: biome check
+        run: cd libs/sdk-ts && pnpm run lint || npx @biomejs/biome check src
+
+  py:
+    name: ruff + mypy (sdk-py)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install ruff mypy
+      - run: ruff check libs/sdk-py
+      - run: mypy --strict libs/sdk-py/crucible_sdk
+
+  rust:
+    name: clippy + rustfmt (sdk-rs)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt,clippy
+      - run: cd libs/sdk-rs && cargo fmt -- --check
+      - run: cd libs/sdk-rs && cargo clippy --all-targets -- -D warnings
+
+  proto:
+    name: buf lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: bufbuild/buf-action@v1
+        with:
+          input: libs/twin-spec
+          lint: true
+          format: true

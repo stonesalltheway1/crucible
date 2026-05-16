@@ -1,0 +1,46 @@
+components:
+  - name: Control plane API
+    description: Task router, plan builder, budget enforcer
+    sloRef: control_plane_availability
+  - name: Twin runtime
+    description: Sandbox + filesystem twin + DB twin
+    sloRef: task_completion_within_estimate
+  - name: Verifier
+    description: Tier 0–4 cross-family verification
+    sloRef: verifier_decision_within_15min
+  - name: Promotion gate
+    description: Rego + KMS + Argo Rollouts
+    sloRef: promotion_canary_success
+  - name: Attestation pipeline
+    description: Sigstore Rekor v2 publishing
+    sloRef: attestation_publish_success
+  - name: Web console
+    description: app.crucible.dev
+    sloRef: control_plane_availability
+  - name: Memory layer
+    description: pgvector + FalkorDB + Redis
+  - name: Cartographer
+    description: Day-1 customer cartography pipeline
+  - name: Shadow recorder
+    description: Tape population from staging
+slos:
+  - id: task_completion_within_estimate
+    objective: 0.90
+    window_days: 30
+    description: Tasks complete within the wall-clock and cost estimate shown in the plan.
+  - id: promotion_canary_success
+    objective: 0.995
+    window_days: 30
+    description: Verified promotions pass canary without rollback.
+  - id: verifier_decision_within_15min
+    objective: 0.95
+    window_days: 30
+    description: Tier 0+1 verification completes within 15 minutes.
+  - id: control_plane_availability
+    objective: 0.999
+    window_days: 30
+    description: Control plane API responsive (excluding planned maintenance).
+  - id: attestation_publish_success
+    objective: 0.9999
+    window_days: 30
+    description: All in-toto attestations successfully published to Rekor.

@@ -1,0 +1,7 @@
+enabled: true
+replicas: 3
+image: { name: verifier }
+service: { port: 9080 }
+resources:
+  requests: { cpu: 1500m, memory: 4Gi }
+  limits:   { cpu: 6000m, memory: 16Gi }

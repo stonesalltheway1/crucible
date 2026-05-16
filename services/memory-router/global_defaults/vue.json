@@ -1,0 +1,234 @@
+{
+  "bundle_version": "1",
+  "stack": "vue",
+  "generated_at": "2026-05-15T20:10:06.834499Z",
+  "generator_commit": "",
+  "license": {
+    "safe_for_redistribution": true,
+    "input_licenses_seen": [
+      "Apache-2.0",
+      "MIT"
+    ],
+    "excluded_licenses": [],
+    "attribution_file": "THIRD_PARTY_SOURCES.md"
+  },
+  "stats": {
+    "repos_examined": 200,
+    "configs_parsed": 120,
+    "agents_md_parsed": 80,
+    "pr_comments_mined": 0,
+    "adrs_parsed": 0,
+    "raw_candidates": 36,
+    "post_judge": 12,
+    "post_agreement": 12,
+    "active_rules": 12,
+    "suggested_rules": 0,
+    "candidate_rules": 0
+  },
+  "conventions": [
+    {
+      "id": "conv_global_vue_dc826192551a47bb",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "src/**/*.{vue,ts}"
+      },
+      "rule_nl": "Components in PascalCase; composables prefixed `use`.",
+      "category": "Naming",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.834499Z",
+      "written_at": "2026-05-15T20:10:06.834499Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.834499Z",
+      "stack_tag": "vue"
+    },
+    {
+      "id": "conv_global_vue_072012d8341647e2",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "src/**/*.ts"
+      },
+      "rule_nl": "Stores under `src/stores/`; pages do not import store internals.",
+      "category": "Layering",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.834499Z",
+      "written_at": "2026-05-15T20:10:06.834499Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.834499Z",
+      "stack_tag": "vue"
+    },
+    {
+      "id": "conv_global_vue_0a037a45bcfb4339",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "src/**/*.ts"
+      },
+      "rule_nl": "Use `pinia` for state; avoid Vuex in new code.",
+      "category": "LibraryPreferences",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.834499Z",
+      "written_at": "2026-05-15T20:10:06.834499Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.834499Z",
+      "stack_tag": "vue"
+    },
+    {
+      "id": "conv_global_vue_37a3937da1d04c19",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "src/**/__tests__/**/*"
+      },
+      "rule_nl": "Vitest + `@testing-library/vue` for component tests.",
+      "category": "TestPatterns",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.834499Z",
+      "written_at": "2026-05-15T20:10:06.834499Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.834499Z",
+      "stack_tag": "vue"
+    },
+    {
+      "id": "conv_global_vue_0529c04b41f14080",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "src/**/*.ts"
+      },
+      "rule_nl": "Reject promises with typed errors; surfaces via `useError()` composable.",
+      "category": "ErrorHandling",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.834499Z",
+      "written_at": "2026-05-15T20:10:06.834499Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.834499Z",
+      "stack_tag": "vue"
+    },
+    {
+      "id": "conv_global_vue_86422c1b4a924b36",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "src/**/*.ts"
+      },
+      "rule_nl": "Use `consola` for client logs; structured.",
+      "category": "Logging",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.834499Z",
+      "written_at": "2026-05-15T20:10:06.834499Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.834499Z",
+      "stack_tag": "vue"
+    },
+    {
+      "id": "conv_global_vue_50c2bd10c7a64dda",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "db/migrations/**/*"
+      },
+      "rule_nl": "Schema changes additive-only.",
+      "category": "MigrationPatterns",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.834499Z",
+      "written_at": "2026-05-15T20:10:06.834499Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.834499Z",
+      "stack_tag": "vue"
+    },
+    {
+      "id": "conv_global_vue_f2da3aed3d8241b8",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "*"
+      },
+      "rule_nl": "Conventional Commits.",
+      "category": "PrCommitHygiene",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.834499Z",
+      "written_at": "2026-05-15T20:10:06.834499Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.834499Z",
+      "stack_tag": "vue"
+    },
+    {
+      "id": "conv_global_vue_99de9038ac7d4dfd",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "src/**/*.vue"
+      },
+      "rule_nl": "Sanitize HTML via `DOMPurify` before v-html.",
+      "category": "SecurityDefaults",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.834499Z",
+      "written_at": "2026-05-15T20:10:06.834499Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.834499Z",
+      "stack_tag": "vue"
+    },
+    {
+      "id": "conv_global_vue_3975ec2e5c444984",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "src/**/*.ts"
+      },
+      "rule_nl": "Use `defineAsyncComponent` for route-level code-splitting.",
+      "category": "PerformanceDefaults",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.834499Z",
+      "written_at": "2026-05-15T20:10:06.834499Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.834499Z",
+      "stack_tag": "vue"
+    },
+    {
+      "id": "conv_global_vue_5420b8afdeb94b4a",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "src/**/*.ts"
+      },
+      "rule_nl": "Cancel inflight requests via AbortController.",
+      "category": "Concurrency",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.834499Z",
+      "written_at": "2026-05-15T20:10:06.834499Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.834499Z",
+      "stack_tag": "vue"
+    },
+    {
+      "id": "conv_global_vue_a2f808393044425c",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "src/**/*.ts"
+      },
+      "rule_nl": "API errors envelope `{ error: { code, message } }`.",
+      "category": "ApiShape",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.834499Z",
+      "written_at": "2026-05-15T20:10:06.834499Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.834499Z",
+      "stack_tag": "vue"
+    }
+  ]
+}

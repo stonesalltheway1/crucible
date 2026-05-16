@@ -1,0 +1,9 @@
+{
+  "description": "Add a per-IP and per-account rate limit to the auth login endpoint.",
+  "stack": "django",
+  "task_description": "The repo has /api/auth/login. Add a sliding-window rate limit: 5 attempts per IP per minute, 10 per username per 5 minutes. Use the redis-py-cluster connection that's already wired in. Existing unit tests must pass + add new tests for the rate-limit behaviour.",
+  "budget_usd_max": 2.20,
+  "wall_clock_min_max": 14,
+  "expect_verifier_verdict": "approved",
+  "assert_no_security_incidents": true
+}

@@ -1,0 +1,70 @@
+syntax = "proto3";
+
+package crucible.v1;
+
+import "google/protobuf/timestamp.proto";
+import "crucible/v1/common.proto";
+
+option go_package = "github.com/crucible/sdk-go/gen/crucible/v1;cruciblev1";
+
+// Convention is the procedural-memory unit (per docs/01-architecture/memory-layer.md).
+// Bi-temporal edges: valid_from / valid_to track when the rule was active.
+message Convention {
+  string id = 1;                       // conv_<ulid>
+  string tenant_id = 2;
+  ScopeFilter scope = 3;
+  string rule_nl = 4;                  // natural-language rule
+  string category = 5;                 // "Logging" | "ErrorHandling" | "Naming" | ...
+  Status status = 6;
+  double confidence = 7;               // 0..1
+  double judge_score = 8;              // 0..1, LLM-as-judge
+  repeated SourceRef source_evidence = 9;
+  google.protobuf.Timestamp valid_from = 10;
+  google.protobuf.Timestamp valid_to = 11;
+  string supersedes = 12;              // convention id that this replaces
+  string writer_oidc_subject = 13;
+  google.protobuf.Timestamp written_at = 14;
+
+  enum Status {
+    STATUS_UNSPECIFIED = 0;
+    STATUS_ACTIVE = 1;
+    STATUS_DRIFTING = 2;
+    STATUS_SUPERSEDED = 3;
+    STATUS_REJECTED = 4;
+  }
+}
+
+message Memory {
+  string id = 1;
+  string content = 2;
+  double importance = 3;               // A-MAC score: utility * confidence * novelty * recency
+  google.protobuf.Timestamp written_at = 4;
+  google.protobuf.Timestamp last_recalled = 5;
+  Kind kind = 6;
+  SourceRef source = 7;
+
+  enum Kind {
+    KIND_UNSPECIFIED = 0;
+    KIND_HOT = 1;                      // current-task context (Redis)
+    KIND_EPISODIC = 2;                 // session transcripts (pgvector)
+    KIND_SEMANTIC = 3;                 // retrieved snippets (pgvector)
+    KIND_PROCEDURAL = 4;               // team convention (FalkorDB)
+  }
+}
+
+// ComplianceReport — verifier checks a diff against active conventions.
+message ComplianceReport {
+  string diff_hash = 1;
+  repeated Violation violations = 2;
+  uint32 conventions_checked = 3;
+  google.protobuf.Timestamp generated_at = 4;
+
+  message Violation {
+    string convention_id = 1;
+    string rule_nl = 2;
+    string offending_file = 3;
+    uint32 offending_line = 4;
+    string snippet = 5;
+    string severity = 6;               // "info" | "warn" | "error"
+  }
+}

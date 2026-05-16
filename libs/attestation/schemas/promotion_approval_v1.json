@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://crucible.dev/PromotionApproval/v1",
+  "title": "PromotionApproval",
+  "type": "object",
+  "required": ["bundle_attestation", "policy_decision", "rego_policy_hash", "approved_at"],
+  "properties": {
+    "bundle_attestation":             { "type": "string" },
+    "policy_decision":                { "type": "string", "enum": ["auto-approve", "human-approved"] },
+    "rego_policy_hash":               { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "rego_decision_doc":              { "type": "object" },
+    "human_approver_oidc_subjects":   { "type": "array", "items": { "type": "string", "format": "uri" } },
+    "kms_signing_key_arn":            { "type": "string" },
+    "lease_id":                       { "type": "string" },
+    "approved_at":                    { "type": "string", "format": "date-time" }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,18 @@
+[project]
+name = "crucible-memory-spec"
+version = "0.5.0"
+description = "Crucible memory-layer types (Phase 5)"
+requires-python = ">=3.11"
+license = { file = "../../../LICENSE" }
+authors = [{ name = "Crucible" }]
+dependencies = []
+
+[project.optional-dependencies]
+test = ["pytest>=8", "jsonschema>=4.21"]
+
+[build-system]
+requires = ["hatchling>=1.21"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["crucible_memory_spec"]

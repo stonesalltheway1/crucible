@@ -1,0 +1,31 @@
+[package]
+name = "twin-runtime-wasm"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Wasmtime-embedded WASM tool runner for LLM-generated tool code inside the outer microVM sandbox."
+
+[lints]
+workspace = true
+
+[dependencies]
+anyhow = { workspace = true }
+thiserror = { workspace = true }
+tokio = { workspace = true }
+async-trait = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+tracing = { workspace = true }
+bytes = { workspace = true }
+sha2 = { workspace = true }
+hex = { workspace = true }
+wasmtime = { workspace = true }
+wasmtime-wasi = { workspace = true }
+wat = { workspace = true }
+
+[dev-dependencies]
+tokio = { workspace = true }
+proptest = { workspace = true }
+pretty_assertions = { workspace = true }

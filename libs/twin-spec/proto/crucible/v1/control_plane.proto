@@ -1,0 +1,126 @@
+syntax = "proto3";
+
+package crucible.v1;
+
+import "google/protobuf/timestamp.proto";
+import "crucible/v1/common.proto";
+import "crucible/v1/task.proto";
+import "crucible/v1/verification.proto";
+
+option go_package = "github.com/crucible/sdk-go/gen/crucible/v1;cruciblev1";
+
+// ControlPlaneService is the Phase-1 surface of the Crucible control plane.
+// Exposed via connect-go: gRPC, gRPC-Web, and HTTP/JSON on the same handlers.
+service ControlPlaneService {
+  // Health check.
+  rpc Health(HealthRequest) returns (HealthResponse);
+
+  // Submit a new task description.
+  rpc SubmitTask(SubmitTaskRequest) returns (SubmitTaskResponse);
+
+  // Fetch a task and its current plan/budget/status.
+  rpc GetTask(GetTaskRequest) returns (GetTaskResponse);
+
+  // List recent tasks for the caller's tenant.
+  rpc ListTasks(ListTasksRequest) returns (ListTasksResponse);
+
+  // Approve or reject the plan attached to a task.
+  rpc ApprovePlan(ApprovePlanRequest) returns (ApprovePlanResponse);
+  rpc RejectPlan(RejectPlanRequest) returns (RejectPlanResponse);
+
+  // Force-rebuild a plan with new constraints (e.g. lower cost cap).
+  rpc ReplanTask(ReplanTaskRequest) returns (ReplanTaskResponse);
+
+  // Read-only budget snapshot.
+  rpc GetBudget(GetBudgetRequest) returns (GetBudgetResponse);
+}
+
+message HealthRequest {}
+message HealthResponse {
+  string status = 1;                   // "ok"
+  string version = 2;                  // "2026.06.0-phase1"
+  google.protobuf.Timestamp now = 3;
+  bool stub_twin_runtime = 4;          // true in Phase 1
+  bool stub_verifier = 5;
+  bool stub_promotion = 6;
+}
+
+message SubmitTaskRequest {
+  string description = 1;
+  string repo = 2;
+  string base_sha = 3;
+  string tenant_id = 4;                // optional in single-tenant Phase 1
+  // Optional caps that override defaults.
+  double cost_cap_usd = 5;
+  uint32 wall_clock_cap_min = 6;
+  uint32 retry_cap_per_subgoal = 7;
+}
+
+message SubmitTaskResponse {
+  Task task = 1;
+}
+
+message GetTaskRequest {
+  string id = 1;
+}
+
+message GetTaskResponse {
+  Task task = 1;
+}
+
+message ListTasksRequest {
+  string tenant_id = 1;
+  uint32 limit = 2;                    // default 50
+  string page_token = 3;
+}
+
+message ListTasksResponse {
+  repeated Task tasks = 1;
+  string next_page_token = 2;
+}
+
+message ApprovePlanRequest {
+  string task_id = 1;
+  string plan_hash = 2;                // optimistic-concurrency guard
+  string approver_oidc_subject = 3;
+  double cost_cap_usd = 4;             // optional override; 0 = use plan's estimate * 1.5
+  uint32 wall_clock_cap_min = 5;
+  uint32 retry_cap_per_subgoal = 6;
+}
+
+message ApprovePlanResponse {
+  Task task = 1;
+  PlanApproval approval = 2;
+}
+
+message RejectPlanRequest {
+  string task_id = 1;
+  string plan_hash = 2;
+  string rejecter_oidc_subject = 3;
+  string reason = 4;
+}
+
+message RejectPlanResponse {
+  Task task = 1;
+  PlanRejection rejection = 2;
+}
+
+message ReplanTaskRequest {
+  string task_id = 1;
+  string reason = 2;
+  // Tighter or looser constraints; zero values use defaults.
+  double cost_cap_usd = 3;
+  uint32 wall_clock_cap_min = 4;
+}
+
+message ReplanTaskResponse {
+  Task task = 1;
+}
+
+message GetBudgetRequest {
+  string task_id = 1;
+}
+
+message GetBudgetResponse {
+  Budget budget = 1;
+}

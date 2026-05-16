@@ -1,0 +1,234 @@
+{
+  "bundle_version": "1",
+  "stack": "express",
+  "generated_at": "2026-05-15T20:10:06.837349Z",
+  "generator_commit": "",
+  "license": {
+    "safe_for_redistribution": true,
+    "input_licenses_seen": [
+      "Apache-2.0",
+      "MIT"
+    ],
+    "excluded_licenses": [],
+    "attribution_file": "THIRD_PARTY_SOURCES.md"
+  },
+  "stats": {
+    "repos_examined": 200,
+    "configs_parsed": 120,
+    "agents_md_parsed": 80,
+    "pr_comments_mined": 0,
+    "adrs_parsed": 0,
+    "raw_candidates": 36,
+    "post_judge": 12,
+    "post_agreement": 12,
+    "active_rules": 12,
+    "suggested_rules": 0,
+    "candidate_rules": 0
+  },
+  "conventions": [
+    {
+      "id": "conv_global_express_25edafffdd994122",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "src/**/*.{ts,js}"
+      },
+      "rule_nl": "Routers grouped per resource under `src/routes/`.",
+      "category": "Naming",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.837349Z",
+      "written_at": "2026-05-15T20:10:06.837349Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.837349Z",
+      "stack_tag": "express"
+    },
+    {
+      "id": "conv_global_express_70df5a23bef44522",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "src/**/*.{ts,js}"
+      },
+      "rule_nl": "Controllers don't access DB; service layer does.",
+      "category": "Layering",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.837349Z",
+      "written_at": "2026-05-15T20:10:06.837349Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.837349Z",
+      "stack_tag": "express"
+    },
+    {
+      "id": "conv_global_express_416d008f10424412",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "src/**/*.{ts,js}"
+      },
+      "rule_nl": "Use `zod` for input validation.",
+      "category": "LibraryPreferences",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.837349Z",
+      "written_at": "2026-05-15T20:10:06.837349Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.837349Z",
+      "stack_tag": "express"
+    },
+    {
+      "id": "conv_global_express_1331f1a817704c95",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "src/**/__tests__/**/*"
+      },
+      "rule_nl": "Vitest or jest; isolated supertest for HTTP.",
+      "category": "TestPatterns",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.837349Z",
+      "written_at": "2026-05-15T20:10:06.837349Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.837349Z",
+      "stack_tag": "express"
+    },
+    {
+      "id": "conv_global_express_09f2c025b8534c7b",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "src/**/*.{ts,js}"
+      },
+      "rule_nl": "Centralized error middleware emits `{ error: { code, message } }`.",
+      "category": "ErrorHandling",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.837349Z",
+      "written_at": "2026-05-15T20:10:06.837349Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.837349Z",
+      "stack_tag": "express"
+    },
+    {
+      "id": "conv_global_express_b02606347b414177",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "src/**/*.{ts,js}"
+      },
+      "rule_nl": "Use `pino` with `pino-http`.",
+      "category": "Logging",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.837349Z",
+      "written_at": "2026-05-15T20:10:06.837349Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.837349Z",
+      "stack_tag": "express"
+    },
+    {
+      "id": "conv_global_express_2025975ed9d94cba",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "db/migrations/**/*"
+      },
+      "rule_nl": "Migrations are additive-only.",
+      "category": "MigrationPatterns",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.837349Z",
+      "written_at": "2026-05-15T20:10:06.837349Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.837349Z",
+      "stack_tag": "express"
+    },
+    {
+      "id": "conv_global_express_b7691069d0f245ff",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "*"
+      },
+      "rule_nl": "Conventional Commits.",
+      "category": "PrCommitHygiene",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.837349Z",
+      "written_at": "2026-05-15T20:10:06.837349Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.837349Z",
+      "stack_tag": "express"
+    },
+    {
+      "id": "conv_global_express_b55fb1ff87094c2f",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "src/**/*.{ts,js}"
+      },
+      "rule_nl": "Use `helmet` + `express-rate-limit` on every router.",
+      "category": "SecurityDefaults",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.837349Z",
+      "written_at": "2026-05-15T20:10:06.837349Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.837349Z",
+      "stack_tag": "express"
+    },
+    {
+      "id": "conv_global_express_1cb8293d87a74fd2",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "src/**/*.{ts,js}"
+      },
+      "rule_nl": "Cursor pagination on list endpoints.",
+      "category": "PerformanceDefaults",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.837349Z",
+      "written_at": "2026-05-15T20:10:06.837349Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.837349Z",
+      "stack_tag": "express"
+    },
+    {
+      "id": "conv_global_express_65edc7767065469f",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "src/**/*.{ts,js}"
+      },
+      "rule_nl": "Use `Promise.allSettled` for fan-out.",
+      "category": "Concurrency",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.837349Z",
+      "written_at": "2026-05-15T20:10:06.837349Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.837349Z",
+      "stack_tag": "express"
+    },
+    {
+      "id": "conv_global_express_dbd3ae68982e4b43",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "src/**/*.{ts,js}"
+      },
+      "rule_nl": "Standard error envelope.",
+      "category": "ApiShape",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.837349Z",
+      "written_at": "2026-05-15T20:10:06.837349Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.837349Z",
+      "stack_tag": "express"
+    }
+  ]
+}

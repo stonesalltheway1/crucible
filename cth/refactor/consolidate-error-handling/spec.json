@@ -1,0 +1,9 @@
+{
+  "description": "Consolidate ad-hoc error handling into a single Result<T,E>-style helper.",
+  "stack": "rust-services",
+  "task_description": "The repo has 31 places using `unwrap()`, 14 with custom error enums, and 6 with `Box<dyn Error>`. Consolidate to thiserror-derived error types per module + return Result<T, E>. Replace `unwrap()` in non-test code with explicit error propagation. Verifier asserts zero unwrap() calls in src/.",
+  "budget_usd_max": 4.00,
+  "wall_clock_min_max": 30,
+  "expect_verifier_verdict": "approved",
+  "assert_no_security_incidents": true
+}

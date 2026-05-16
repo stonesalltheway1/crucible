@@ -1,0 +1,236 @@
+{
+  "bundle_version": "1",
+  "stack": "django",
+  "generated_at": "2026-05-15T20:10:06.816411Z",
+  "generator_commit": "",
+  "license": {
+    "safe_for_redistribution": true,
+    "input_licenses_seen": [
+      "Apache-2.0",
+      "BSD-3-Clause",
+      "MIT",
+      "Public Domain"
+    ],
+    "excluded_licenses": [],
+    "attribution_file": "THIRD_PARTY_SOURCES.md"
+  },
+  "stats": {
+    "repos_examined": 200,
+    "configs_parsed": 120,
+    "agents_md_parsed": 80,
+    "pr_comments_mined": 0,
+    "adrs_parsed": 0,
+    "raw_candidates": 36,
+    "post_judge": 12,
+    "post_agreement": 12,
+    "active_rules": 12,
+    "suggested_rules": 0,
+    "candidate_rules": 0
+  },
+  "conventions": [
+    {
+      "id": "conv_global_django_76ecc766349d4da9",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "**/models.py"
+      },
+      "rule_nl": "Models use PascalCase; managers end in `Manager`.",
+      "category": "Naming",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.816411Z",
+      "written_at": "2026-05-15T20:10:06.816411Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.816411Z",
+      "stack_tag": "django"
+    },
+    {
+      "id": "conv_global_django_14a478a9930f4706",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "**/*.py"
+      },
+      "rule_nl": "Models, services, selectors, apis layering (HackSoft).",
+      "category": "Layering",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.816411Z",
+      "written_at": "2026-05-15T20:10:06.816411Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.816411Z",
+      "stack_tag": "django"
+    },
+    {
+      "id": "conv_global_django_b23f9f429d744177",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "**/*.py"
+      },
+      "rule_nl": "Use `django-extensions` for ULID PKs.",
+      "category": "LibraryPreferences",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.816411Z",
+      "written_at": "2026-05-15T20:10:06.816411Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.816411Z",
+      "stack_tag": "django"
+    },
+    {
+      "id": "conv_global_django_e7605bc74852425a",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "tests/**/*.py"
+      },
+      "rule_nl": "Tests use `pytest-django` factories; no Django TestCase by default.",
+      "category": "TestPatterns",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.816411Z",
+      "written_at": "2026-05-15T20:10:06.816411Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.816411Z",
+      "stack_tag": "django"
+    },
+    {
+      "id": "conv_global_django_63d219b17603485e",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "**/services.py"
+      },
+      "rule_nl": "Service-layer raises domain exceptions; views translate to HTTP.",
+      "category": "ErrorHandling",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.816411Z",
+      "written_at": "2026-05-15T20:10:06.816411Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.816411Z",
+      "stack_tag": "django"
+    },
+    {
+      "id": "conv_global_django_3191f6c8c5de49bd",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "**/*.py"
+      },
+      "rule_nl": "Structured logs via `structlog`.",
+      "category": "Logging",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.816411Z",
+      "written_at": "2026-05-15T20:10:06.816411Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.816411Z",
+      "stack_tag": "django"
+    },
+    {
+      "id": "conv_global_django_161a33c545c84ec3",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "**/migrations/**/*.py"
+      },
+      "rule_nl": "Migrations are additive-only and have a `RunPython.noop` reverse.",
+      "category": "MigrationPatterns",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.816411Z",
+      "written_at": "2026-05-15T20:10:06.816411Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.816411Z",
+      "stack_tag": "django"
+    },
+    {
+      "id": "conv_global_django_00417d561f924fd9",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "*"
+      },
+      "rule_nl": "Conventional Commits + isort + black.",
+      "category": "PrCommitHygiene",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.816411Z",
+      "written_at": "2026-05-15T20:10:06.816411Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.816411Z",
+      "stack_tag": "django"
+    },
+    {
+      "id": "conv_global_django_a7c02f0c050b4b74",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "**/*.py"
+      },
+      "rule_nl": "Use Django's CSRF middleware on session views.",
+      "category": "SecurityDefaults",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.816411Z",
+      "written_at": "2026-05-15T20:10:06.816411Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.816411Z",
+      "stack_tag": "django"
+    },
+    {
+      "id": "conv_global_django_fea2a7d1d8d94438",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "**/*.py"
+      },
+      "rule_nl": "Use `select_related`/`prefetch_related` on QuerySets.",
+      "category": "PerformanceDefaults",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.816411Z",
+      "written_at": "2026-05-15T20:10:06.816411Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.816411Z",
+      "stack_tag": "django"
+    },
+    {
+      "id": "conv_global_django_9565f0b0d8954c5e",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "**/views.py"
+      },
+      "rule_nl": "ASGI views must remain `async def` end-to-end.",
+      "category": "Concurrency",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.816411Z",
+      "written_at": "2026-05-15T20:10:06.816411Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.816411Z",
+      "stack_tag": "django"
+    },
+    {
+      "id": "conv_global_django_3947ef7c66d240bd",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "**/serializers.py"
+      },
+      "rule_nl": "DRF errors use `{ detail, code }` envelope.",
+      "category": "ApiShape",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.816411Z",
+      "written_at": "2026-05-15T20:10:06.816411Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.816411Z",
+      "stack_tag": "django"
+    }
+  ]
+}

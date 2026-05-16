@@ -1,0 +1,7 @@
+enabled: true
+replicas: 2
+image: { name: cartographer }
+service: { port: 9420 }
+resources:
+  requests: { cpu: 1000m, memory: 2Gi }
+  limits:   { cpu: 4000m, memory: 8Gi }

@@ -1,0 +1,40 @@
+# Crucible CODEOWNERS
+# Per ADR-012: every top-level dir has a component owner.
+# Stub assignments — replace with real GitHub teams once the project is on GitHub.
+
+* @crucible/maintainers
+
+# Architectural decisions and docs require lead approval.
+/docs/                          @crucible/leads
+/docs/05-decisions/             @crucible/leads
+/flake.nix                      @crucible/build
+/.github/                       @crucible/build @crucible/security
+
+# Control Plane
+/apps/control-plane/            @crucible/control-plane
+/libs/model-routing/            @crucible/control-plane
+
+# Twin Runtime — load-bearing trust surface
+/apps/twin-runtime/             @crucible/twin @crucible/security
+/libs/sdk-go/                   @crucible/twin
+/libs/sdk-ts/                   @crucible/twin
+/libs/sdk-py/                   @crucible/twin
+/libs/sdk-rs/                   @crucible/twin
+
+# Verifier
+/apps/verifier/                 @crucible/verifier
+/verifiers/                     @crucible/verifier
+
+# Promotion Gate — security-critical
+/apps/promotion-gate/           @crucible/security
+/libs/policy/                   @crucible/security
+/libs/attestation/              @crucible/security
+/services/attestation-relay/    @crucible/security
+
+# Memory
+/apps/distiller/                @crucible/memory
+/services/memory-router/        @crucible/memory
+/libs/memory-spec/              @crucible/memory
+
+# Schema source-of-truth
+/libs/twin-spec/                @crucible/leads @crucible/control-plane

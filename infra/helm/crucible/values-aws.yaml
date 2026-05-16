@@ -1,0 +1,17 @@
+# AWS-flavoured overrides.
+crucible:
+  postgres:
+    host: ""              # Set to the RDS host
+    sslMode: verify-full
+  objectStorage:
+    type: s3
+    endpoint: s3.<region>.amazonaws.com
+  kms:
+    provider: aws-kms
+    keyRef: arn:aws:kms:<region>:<account>:key/<id>
+  observability:
+    tracing:
+      exporter: xray
+      endpoint: ""
+global:
+  storageClass: gp3

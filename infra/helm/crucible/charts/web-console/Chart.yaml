@@ -1,0 +1,6 @@
+apiVersion: v2
+name: web-console
+description: Crucible web console (Next.js 15).
+type: application
+version: 2026.6.0
+appVersion: "2026.06.0"

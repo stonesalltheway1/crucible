@@ -1,0 +1,234 @@
+{
+  "bundle_version": "1",
+  "stack": "rails",
+  "generated_at": "2026-05-15T20:10:06.821752Z",
+  "generator_commit": "",
+  "license": {
+    "safe_for_redistribution": true,
+    "input_licenses_seen": [
+      "Apache-2.0",
+      "MIT"
+    ],
+    "excluded_licenses": [],
+    "attribution_file": "THIRD_PARTY_SOURCES.md"
+  },
+  "stats": {
+    "repos_examined": 200,
+    "configs_parsed": 120,
+    "agents_md_parsed": 80,
+    "pr_comments_mined": 0,
+    "adrs_parsed": 0,
+    "raw_candidates": 36,
+    "post_judge": 12,
+    "post_agreement": 12,
+    "active_rules": 12,
+    "suggested_rules": 0,
+    "candidate_rules": 0
+  },
+  "conventions": [
+    {
+      "id": "conv_global_rails_1d5536ea761f4b6a",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "app/models/**/*.rb"
+      },
+      "rule_nl": "Models PascalCase; tables plural snake_case.",
+      "category": "Naming",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.821752Z",
+      "written_at": "2026-05-15T20:10:06.821752Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.821752Z",
+      "stack_tag": "rails"
+    },
+    {
+      "id": "conv_global_rails_8c7c358792b4400d",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "app/**/*.rb"
+      },
+      "rule_nl": "Service objects under `app/services/`; controllers stay thin.",
+      "category": "Layering",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.821752Z",
+      "written_at": "2026-05-15T20:10:06.821752Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.821752Z",
+      "stack_tag": "rails"
+    },
+    {
+      "id": "conv_global_rails_0ca90bd9a8d6408c",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "app/**/*.rb"
+      },
+      "rule_nl": "Use `dry-monads` for Result; no `rescue StandardError` for control flow.",
+      "category": "LibraryPreferences",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.821752Z",
+      "written_at": "2026-05-15T20:10:06.821752Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.821752Z",
+      "stack_tag": "rails"
+    },
+    {
+      "id": "conv_global_rails_feaa4b4f47bb464c",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "spec/**/*.rb"
+      },
+      "rule_nl": "Use rspec; avoid Minitest unless legacy.",
+      "category": "TestPatterns",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.821752Z",
+      "written_at": "2026-05-15T20:10:06.821752Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.821752Z",
+      "stack_tag": "rails"
+    },
+    {
+      "id": "conv_global_rails_ede0c3b724ee40c3",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "app/controllers/**/*.rb"
+      },
+      "rule_nl": "Errors derive from `ApplicationError`; controllers `rescue_from`.",
+      "category": "ErrorHandling",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.821752Z",
+      "written_at": "2026-05-15T20:10:06.821752Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.821752Z",
+      "stack_tag": "rails"
+    },
+    {
+      "id": "conv_global_rails_4a4329f560eb41b6",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "app/**/*.rb"
+      },
+      "rule_nl": "Tagged logging with `Rails.logger.tagged`.",
+      "category": "Logging",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.821752Z",
+      "written_at": "2026-05-15T20:10:06.821752Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.821752Z",
+      "stack_tag": "rails"
+    },
+    {
+      "id": "conv_global_rails_90305a4ae88346ba",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "db/migrate/**/*.rb"
+      },
+      "rule_nl": "Migrations are reversible.",
+      "category": "MigrationPatterns",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.821752Z",
+      "written_at": "2026-05-15T20:10:06.821752Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.821752Z",
+      "stack_tag": "rails"
+    },
+    {
+      "id": "conv_global_rails_8d4c87a226384d57",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "*"
+      },
+      "rule_nl": "Conventional Commits.",
+      "category": "PrCommitHygiene",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.821752Z",
+      "written_at": "2026-05-15T20:10:06.821752Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.821752Z",
+      "stack_tag": "rails"
+    },
+    {
+      "id": "conv_global_rails_bccfec8cb42049b2",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "app/controllers/**/*.rb"
+      },
+      "rule_nl": "Use Strong Params on controllers.",
+      "category": "SecurityDefaults",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.821752Z",
+      "written_at": "2026-05-15T20:10:06.821752Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.821752Z",
+      "stack_tag": "rails"
+    },
+    {
+      "id": "conv_global_rails_269a68b4a9de4ffe",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "app/controllers/**/*.rb"
+      },
+      "rule_nl": "Cursor-paginated lists via `pagy`.",
+      "category": "PerformanceDefaults",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.821752Z",
+      "written_at": "2026-05-15T20:10:06.821752Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.821752Z",
+      "stack_tag": "rails"
+    },
+    {
+      "id": "conv_global_rails_d40e00e9a71d4f68",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "app/jobs/**/*.rb"
+      },
+      "rule_nl": "Use Sidekiq for background jobs; no in-process threads.",
+      "category": "Concurrency",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.821752Z",
+      "written_at": "2026-05-15T20:10:06.821752Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.821752Z",
+      "stack_tag": "rails"
+    },
+    {
+      "id": "conv_global_rails_a7d184387e404e36",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "app/controllers/api/**/*.rb"
+      },
+      "rule_nl": "JSON:API or `{ data, errors }` envelope.",
+      "category": "ApiShape",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.821752Z",
+      "written_at": "2026-05-15T20:10:06.821752Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.821752Z",
+      "stack_tag": "rails"
+    }
+  ]
+}

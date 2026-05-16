@@ -1,0 +1,9 @@
+{
+  "description": "Greenfield Go gRPC service with buf, protobuf, slog, postgres CRUD.",
+  "stack": "go-services",
+  "task_description": "Build a Go 1.23 gRPC service with one resource (orders). Use buf for proto, slog for structured logging, pgx for Postgres. Include unit tests and a docker-compose for local dev. `go test ./...` should pass; `go vet ./...` clean.",
+  "budget_usd_max": 3.50,
+  "wall_clock_min_max": 22,
+  "expect_verifier_verdict": "approved",
+  "assert_no_security_incidents": true
+}

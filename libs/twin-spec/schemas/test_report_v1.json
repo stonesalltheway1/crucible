@@ -1,0 +1,28 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://crucible.dev/TestReport/v1",
+  "title": "TestReport",
+  "type": "object",
+  "required": ["task_id", "test_kind", "framework", "passed", "stats", "duration_seconds", "verifier_oidc_subject"],
+  "properties": {
+    "task_id":              { "type": "string" },
+    "test_kind":            { "type": "string", "enum": ["tier_0_mutation", "tier_1_pbt", "tier_2_contract", "tier_3_proof", "tier_4_honest_ci", "project_native"] },
+    "framework":            { "type": "string" },
+    "passed":               { "type": "boolean" },
+    "stats": {
+      "type": "object",
+      "properties": {
+        "killed":           { "type": "integer", "minimum": 0 },
+        "survived":         { "type": "integer", "minimum": 0 },
+        "score":            { "type": "number", "minimum": 0, "maximum": 1 },
+        "iterations":       { "type": "integer", "minimum": 0 },
+        "counterexamples":  { "type": "array", "items": { "type": "string" } }
+      },
+      "additionalProperties": true
+    },
+    "duration_seconds":     { "type": "number", "minimum": 0 },
+    "verifier_model":       { "type": "string" },
+    "verifier_oidc_subject":{ "type": "string", "format": "uri" }
+  },
+  "additionalProperties": false
+}

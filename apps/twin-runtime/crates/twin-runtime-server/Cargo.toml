@@ -1,0 +1,47 @@
+[package]
+name = "twin-runtime-server"
+description = "The Crucible Twin Runtime gRPC server binary"
+version = { workspace = true }
+edition = { workspace = true }
+rust-version = { workspace = true }
+license = { workspace = true }
+repository = { workspace = true }
+
+[[bin]]
+name = "crucible-twin-runtime"
+path = "src/main.rs"
+
+[dependencies]
+crucible-sandbox-spec = { workspace = true }
+twin-runtime-proto = { workspace = true }
+twin-runtime-shim = { workspace = true }
+twin-runtime-sandbox = { workspace = true }
+twin-runtime-fs = { workspace = true }
+twin-runtime-egress = { workspace = true }
+twin-runtime-lifecycle = { workspace = true }
+twin-runtime-attest = { workspace = true }
+
+tonic = { workspace = true }
+prost = { workspace = true }
+prost-types = { workspace = true }
+tokio = { workspace = true }
+tokio-stream = { version = "0.1", features = ["sync"] }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+chrono = { workspace = true }
+async-trait = { workspace = true }
+anyhow = { workspace = true }
+thiserror = { workspace = true }
+futures = { workspace = true }
+toml = { workspace = true }
+humantime-serde = { workspace = true }
+
+[dev-dependencies]
+tokio = { workspace = true }
+tempfile = { workspace = true }
+pretty_assertions = { workspace = true }
+
+[lints]
+workspace = true

@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://crucible.dev/DestructiveProposal/v1",
+  "title": "DestructiveProposal",
+  "type": "object",
+  "required": ["task_id", "tenant_id", "command", "scope", "blast_radius", "intercepted_at_layer", "agent_oidc_subject"],
+  "properties": {
+    "task_id":               { "type": "string" },
+    "tenant_id":             { "type": "string" },
+    "command":               { "type": "string", "minLength": 1 },
+    "scope":                 { "type": "string", "enum": ["twin", "real"] },
+    "justification":         { "type": "string" },
+    "blast_radius": {
+      "type": "object",
+      "required": ["affected_resources", "reversibility", "impact_score"],
+      "properties": {
+        "affected_resources": { "type": "array", "items": { "type": "string" } },
+        "reversibility":      { "type": "string", "enum": ["trivial", "snapshot", "lossy", "irreversible"] },
+        "impact_score":       { "type": "number", "minimum": 0, "maximum": 1 }
+      },
+      "additionalProperties": false
+    },
+    "intercepted_at_layer":  { "type": "string", "enum": ["syscall-shim", "cmd-line-parse", "ebpf"] },
+    "agent_oidc_subject":    { "type": "string", "format": "uri" }
+  },
+  "additionalProperties": false
+}

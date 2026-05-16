@@ -1,0 +1,10 @@
+{
+  "description": "Greenfield Next.js 15 todo app with Prisma + SQLite, Tailwind shadcn UI, Vitest tests.",
+  "stack": "nextjs",
+  "task_description": "Build a Next.js 15 todo app with App Router. Use Prisma + SQLite for storage, shadcn/ui for components, Vitest for tests. Include CRUD: create, list, toggle complete, delete. Single user (no auth). Should pass `pnpm test` and `pnpm build` with zero errors.",
+  "budget_usd_max": 4.00,
+  "wall_clock_min_max": 25,
+  "expect_verifier_verdict": "approved",
+  "assert_no_security_incidents": true,
+  "expect_cache_hit_rate_min": 0.40
+}

@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://crucible.dev/VerifierApproval/v1",
+  "title": "VerifierApproval",
+  "type": "object",
+  "required": ["task_id", "diff_hash", "verdict", "rubric_score", "tier_results", "executor_oidc_subject", "verifier_oidc_subject", "signed_at"],
+  "properties": {
+    "task_id":               { "type": "string" },
+    "diff_hash":             { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "verdict":               { "type": "string", "enum": ["approved"] },
+    "rubric_score":          { "type": "number", "minimum": 0, "maximum": 1 },
+    "tier_results": {
+      "type": "object",
+      "patternProperties": {
+        "^tier_[0-4]$": {
+          "type": "object",
+          "required": ["passed"],
+          "properties": {
+            "passed":              { "type": "boolean" },
+            "report_attestation":  { "type": "string" },
+            "score":               { "type": "number" }
+          },
+          "additionalProperties": true
+        }
+      },
+      "additionalProperties": false
+    },
+    "rejection_reasons":     { "type": "array", "maxItems": 0 },
+    "executor_oidc_subject": { "type": "string", "format": "uri" },
+    "verifier_oidc_subject": { "type": "string", "format": "uri" },
+    "executor_model":        { "type": "string" },
+    "verifier_model":        { "type": "string" },
+    "signed_at":             { "type": "string", "format": "date-time" }
+  },
+  "additionalProperties": false
+}

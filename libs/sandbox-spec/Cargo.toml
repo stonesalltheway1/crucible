@@ -1,0 +1,38 @@
+[package]
+name = "crucible-sandbox-spec"
+version = "2026.6.0-phase2"
+edition = "2021"
+rust-version = "1.82"
+description = "SandboxProvider trait + conformance test corpus for Crucible Twin Runtime"
+license = "Apache-2.0"
+repository = "https://github.com/crucible/crucible"
+
+[lib]
+path = "src/lib.rs"
+
+[features]
+default = []
+# `conformance` exposes the test corpus to downstream provider crates so each
+# concrete implementation (E2B, raw-Firecracker, Modal, ...) can prove it
+# satisfies the trait under cargo-test. Behind a feature gate to keep the
+# release crate slim.
+conformance = ["dep:tempfile", "dep:tokio"]
+
+[dependencies]
+async-trait = "0.1"
+thiserror = "2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+chrono = { version = "0.4", default-features = false, features = ["serde", "clock"] }
+sha2 = "0.10"
+hex = "0.4"
+tracing = "0.1"
+
+# Optional, behind the `conformance` feature.
+tempfile = { version = "3", optional = true }
+tokio = { version = "1", features = ["macros", "rt", "time", "sync"], optional = true }
+
+[dev-dependencies]
+tokio = { version = "1", features = ["macros", "rt", "time", "sync", "test-util"] }
+proptest = "1.5"
+tempfile = "3"

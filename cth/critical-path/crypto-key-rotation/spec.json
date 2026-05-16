@@ -1,0 +1,10 @@
+{
+  "description": "Implement KMS-backed crypto key rotation; Tier 3 verifies no plaintext leaks.",
+  "stack": "go-services",
+  "task_description": "Add a key rotation flow for app-level secret encryption keys. Old ciphertexts must remain readable. New ciphertexts use the new key. Annotate the rotation + decryption helpers @critical. Tier 3 Dafny proof: no plaintext written outside the explicit decrypt() return.",
+  "budget_usd_max": 6.00,
+  "wall_clock_min_max": 40,
+  "expect_verifier_verdict": "approved",
+  "expect_tier3_triggered": true,
+  "assert_no_security_incidents": true
+}

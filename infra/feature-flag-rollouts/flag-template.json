@@ -1,0 +1,22 @@
+{
+  "$schema": "https://schemas.growthbook.io/feature/v1",
+  "_comment": "Template the gate's delivery_adapter clones at promotion time. The gate fills in <promotion-id>, <service>, and the per-step rollout percent.",
+  "id": "crucible_<promotion-id>",
+  "description": "Crucible promotion <promotion-id> for service <service>",
+  "type": "boolean",
+  "defaultValue": false,
+  "tags": ["crucible", "promotion"],
+  "owner": "crucible-promotion-gate",
+  "rules": [
+    {
+      "id": "rollout-rule",
+      "type": "rollout",
+      "percent": 0.01,
+      "value": true,
+      "condition": {
+        "crucible_promotion_id": "<promotion-id>"
+      },
+      "description": "Initial 1% canary."
+    }
+  ]
+}

@@ -1,0 +1,81 @@
+syntax = "proto3";
+
+package crucible.v1;
+
+import "google/protobuf/timestamp.proto";
+import "crucible/v1/common.proto";
+import "crucible/v1/memory.proto";
+import "crucible/v1/memory_layer.proto";
+
+option go_package = "github.com/crucible/memory-spec/gen/crucible/v1;memoryv1";
+
+// SourceChannel is the upstream system a distiller is consuming. Adapters
+// are 1:1 with this enum; adding a new channel requires extending it.
+enum SourceChannel {
+  SOURCE_CHANNEL_UNSPECIFIED = 0;
+  SOURCE_CHANNEL_GITHUB_PR_REVIEW = 1;
+  SOURCE_CHANNEL_GITHUB_SQUASH_MERGE = 2;
+  SOURCE_CHANNEL_INCIDENT_EXPORT = 3;   // Rootly / FireHydrant / Jeli / Incident.io
+  SOURCE_CHANNEL_SLACK_INCIDENTS = 4;
+  SOURCE_CHANNEL_CONFLUENCE_PAGE = 5;
+  SOURCE_CHANNEL_NOTION_PAGE = 6;
+  SOURCE_CHANNEL_ADR_FILE = 7;
+  SOURCE_CHANNEL_LINT_CONFIG = 8;       // cartographer-extracted, deterministic
+}
+
+// DistillerJob is the queue payload. One job per upstream item.
+message DistillerJob {
+  string id = 1;                        // job_<ulid>
+  string tenant_id = 2;
+  SourceChannel channel = 3;
+  string repo = 4;                      // empty for org-scoped sources
+  SourceRef source = 5;
+  bytes payload = 6;                    // utf-8 text or json depending on channel
+  google.protobuf.Timestamp enqueued_at = 7;
+  uint32 attempts = 8;
+  // Distillers refuse to process payloads larger than 256 KiB; jobs that
+  // exceed it are chunked at the adapter layer.
+  uint32 payload_size_bytes = 9;
+}
+
+// ExtractionResult is what the Mem0-style extractor returns. Multiple
+// candidates per job are possible (e.g. a long ADR may yield 3 rules).
+message ExtractionResult {
+  string job_id = 1;
+  repeated ConventionCandidate candidates = 2;
+  uint32 latency_ms = 3;
+  string extractor_model = 4;
+  uint32 input_tokens = 5;
+  uint32 output_tokens = 6;
+  double cost_usd = 7;
+  // If empty, the extractor saw no enforceable rule (the brief is "emit
+  // nothing if no enforceable convention is stated").
+  string null_extraction_reason = 8;
+}
+
+// JudgeVerdict is the LLM-as-judge filter's output. Every candidate
+// receives a verdict before reaching the graph. Used both for extraction
+// quality AND prompt-injection defence.
+message JudgeVerdict {
+  string candidate_id = 1;
+  bool quarantine = 2;                  // true = drop, do not admit
+  double score = 3;                     // 0..1
+  string rationale = 4;
+  string judge_model = 5;
+  string injection_category = 6;        // "" | "prompt_injection" | "malformed" | "off_taxonomy" | "low_specificity"
+  // Confidence in the verdict itself — calibrated via Platt scaling on the
+  // held-out adversarial corpus.
+  double judge_confidence = 7;
+}
+
+// AgreementScore is the cross-source agreement signal used by the
+// confidence calibrator. Counts independent corroborating sources;
+// distinct_repos is the primary trust signal.
+message AgreementScore {
+  uint32 distinct_repos = 1;
+  uint32 distinct_authors = 2;
+  uint32 corroborating_evidence_count = 3;
+  uint32 contradicting_evidence_count = 4;
+  double raw_score = 5;                 // log(distinct_repos+1) / log(repos_examined+1)
+  double platt_scaled = 6;              // calibrated confidence
+}

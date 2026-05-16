@@ -1,0 +1,74 @@
+{
+  "$schema": "https://crucible.dev/schemas/airgap-bundle-manifest-v1.json",
+  "version": "2026.06.0",
+  "build_date": "2026-05-15",
+  "slsa_provenance_format": "in-toto-v1",
+  "slsa_level": 3,
+  "components": {
+    "images": [
+      "control-plane",
+      "twin-runtime",
+      "twin-runtime-self-host",
+      "verifier",
+      "memory-router",
+      "distiller",
+      "cartographer",
+      "shadow-recorder",
+      "tape-scrubber",
+      "promotion-gate",
+      "attestation-relay",
+      "cost-meter",
+      "web-console",
+      "github-app",
+      "slack-bot",
+      "verifier-runner-python",
+      "verifier-runner-typescript",
+      "verifier-runner-rust",
+      "verifier-runner-go",
+      "verifier-runner-java",
+      "verifier-runner-swift"
+    ],
+    "helm_charts": [
+      "crucible-2026.6.0.tgz"
+    ],
+    "sigstore": {
+      "rekor": "rekor-bundle/",
+      "fulcio": "fulcio-bundle/",
+      "trusted_root": "sigstore/trusted-root.json"
+    },
+    "models": [
+      {
+        "name": "llama-4-scout",
+        "publisher": "Meta",
+        "license": "llama-4-community-license",
+        "size_gb": 8.4,
+        "weights_path": "models/llama-4-scout/"
+      },
+      {
+        "name": "deepseek-v4-pro",
+        "publisher": "DeepSeek",
+        "license": "deepseek-license-v1",
+        "size_gb": 13.7,
+        "weights_path": "models/deepseek-v4-pro/"
+      },
+      {
+        "name": "qwen3-coder-plus",
+        "publisher": "Alibaba",
+        "license": "tongyi-qianwen-license",
+        "size_gb": 10.2,
+        "weights_path": "models/qwen3-coder-plus/"
+      }
+    ],
+    "policies": {
+      "promotion_rego": "policies/default-rego/",
+      "egress_cilium": "policies/default-egress/cilium/",
+      "egress_tetragon": "policies/default-egress/tetragon/"
+    }
+  },
+  "verification": {
+    "method": "cosign keyless OIDC",
+    "issuer": "https://token.actions.githubusercontent.com",
+    "subject_regex": "https://github.com/crucible/.*",
+    "manifest_hash_algorithm": "sha256"
+  }
+}

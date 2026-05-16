@@ -1,0 +1,83 @@
+{
+  "name": "crucible-vscode",
+  "displayName": "Crucible",
+  "description": "Plan approval, budget viewer, attestation chain explorer — Crucible's evidence-driven AI engineering surfaces inside VS Code.",
+  "version": "2026.06.0-phase7",
+  "publisher": "crucible",
+  "engines": { "vscode": "^1.95.0" },
+  "categories": ["AI", "Other"],
+  "icon": "media/icon.png",
+  "main": "./dist/extension.js",
+  "activationEvents": ["onStartupFinished"],
+  "contributes": {
+    "commands": [
+      { "command": "crucible.newTask", "title": "Crucible: New Task" },
+      { "command": "crucible.openTask", "title": "Crucible: Open Task" },
+      { "command": "crucible.approvePlan", "title": "Crucible: Approve Plan" },
+      { "command": "crucible.rejectPlan", "title": "Crucible: Reject Plan" },
+      { "command": "crucible.interruptTask", "title": "Crucible: Halt at next checkpoint" },
+      { "command": "crucible.viewAttestation", "title": "Crucible: View Attestation" },
+      { "command": "crucible.openWebConsole", "title": "Crucible: Open Web Console" },
+      { "command": "crucible.signIn", "title": "Crucible: Sign in" },
+      { "command": "crucible.signOut", "title": "Crucible: Sign out" }
+    ],
+    "viewsContainers": {
+      "activitybar": [
+        { "id": "crucible", "title": "Crucible", "icon": "media/sidebar.svg" }
+      ]
+    },
+    "views": {
+      "crucible": [
+        { "id": "crucible.tasks", "name": "Tasks", "icon": "media/sidebar.svg" },
+        { "id": "crucible.attestations", "name": "Attestations" }
+      ]
+    },
+    "configuration": {
+      "title": "Crucible",
+      "properties": {
+        "crucible.apiEndpoint": {
+          "type": "string",
+          "default": "https://api.crucible.dev",
+          "description": "Crucible control plane endpoint. Override for self-hosted."
+        },
+        "crucible.mcpServerCmd": {
+          "type": "string",
+          "default": "crucible-mcp",
+          "description": "Command that launches the Crucible MCP server bundled with the extension."
+        },
+        "crucible.tenantId": {
+          "type": "string",
+          "description": "Tenant override. Normally derived from your OAuth login."
+        },
+        "crucible.confirmDestructive": {
+          "type": "boolean",
+          "default": true,
+          "description": "Always confirm before approving destructive operations."
+        }
+      }
+    },
+    "menus": {
+      "commandPalette": [
+        { "command": "crucible.approvePlan", "when": "crucible.taskHasPendingPlan" }
+      ]
+    }
+  },
+  "scripts": {
+    "compile": "esbuild ./src/extension.ts --bundle --outfile=dist/extension.js --external:vscode --format=cjs --platform=node --target=node20",
+    "watch": "npm run compile -- --watch",
+    "package": "vsce package --no-dependencies",
+    "test": "node ./dist/test/runTest.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "1.5.0",
+    "eventsource-parser": "3.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "22.13.4",
+    "@types/vscode": "1.95.0",
+    "@vscode/test-electron": "2.4.1",
+    "@vscode/vsce": "3.2.2",
+    "esbuild": "0.24.2",
+    "typescript": "5.7.3"
+  }
+}

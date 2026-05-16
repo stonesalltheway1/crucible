@@ -1,0 +1,70 @@
+"""Crucible Agent SDK — Python.
+
+Phase 1 ships types only. The runtime ``twin.*`` surface arrives with Phase 2
+once the AgentSdkService gRPC handlers exist in apps/twin-runtime.
+"""
+
+from .types import (
+    Action,
+    BlastRadius,
+    Budget,
+    Complexity,
+    Convention,
+    ConventionStatus,
+    DestructiveProposal,
+    Diff,
+    ErrorCode,
+    ExecResult,
+    ExternalEffect,
+    FileChange,
+    Glob,
+    MemoryKind,
+    Plan,
+    PlanApproval,
+    PlanRejection,
+    PlanStep,
+    Predicates,
+    Reversibility,
+    Risk,
+    Routing,
+    Scope,
+    ScopeFilter,
+    SecretRef,
+    SourceRef,
+    Task,
+    TaskStatus,
+)
+
+__version__ = "2026.6.0-phase1"
+
+__all__ = [
+    "Action",
+    "BlastRadius",
+    "Budget",
+    "Complexity",
+    "Convention",
+    "ConventionStatus",
+    "DestructiveProposal",
+    "Diff",
+    "ErrorCode",
+    "ExecResult",
+    "ExternalEffect",
+    "FileChange",
+    "Glob",
+    "MemoryKind",
+    "Plan",
+    "PlanApproval",
+    "PlanRejection",
+    "PlanStep",
+    "Predicates",
+    "Reversibility",
+    "Risk",
+    "Routing",
+    "Scope",
+    "ScopeFilter",
+    "SecretRef",
+    "SourceRef",
+    "Task",
+    "TaskStatus",
+    "__version__",
+]

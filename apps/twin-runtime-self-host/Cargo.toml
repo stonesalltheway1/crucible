@@ -1,0 +1,62 @@
+[package]
+name = "twin-runtime-self-host"
+version = "2026.6.0-phase3"
+edition = "2021"
+rust-version = "1.82"
+license = "Apache-2.0"
+repository = "https://github.com/crucible/crucible"
+description = "Raw Firecracker + containerd + ZFS orchestrator for the Crucible self-hosted enterprise tier."
+
+[[bin]]
+name = "crucible-twin-self-host"
+path = "src/main.rs"
+
+[lints]
+workspace = true
+
+[dependencies]
+# Reuse the parent workspace's centralised dependency versions.
+tokio = { workspace = true }
+async-trait = { workspace = true }
+thiserror = { workspace = true }
+anyhow = { workspace = true }
+futures = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+serde_yaml = { workspace = true }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+chrono = { workspace = true }
+sha2 = { workspace = true }
+hex = { workspace = true }
+tempfile = { workspace = true }
+fs-err = { workspace = true }
+
+# Pinned to the May 2026 Firecracker line (~1.10). `firec` is the thin REST/
+# Unix-socket client. We add it as an OPTIONAL dependency so the bin can
+# compile on macOS / Windows developer hosts; the actual orchestrator
+# functionality is feature-gated behind `linux-firecracker`.
+firec = { version = "0.7", optional = true }
+
+# Sandbox spec — the trait we implement.
+crucible-sandbox-spec = { workspace = true }
+
+[dev-dependencies]
+tokio = { workspace = true }
+pretty_assertions = { workspace = true }
+proptest = { workspace = true }
+
+[features]
+# `linux-firecracker` enables the actual Firecracker invocations. Without
+# the feature, the orchestrator binary still builds but each spawn returns
+# a typed Phase-3 Stub error explaining what's missing. Production builds
+# enable this; the cross-platform `cargo check` does not.
+default = []
+linux-firecracker = ["dep:firec"]
+
+# Lints — inherits workspace lints.
+[workspace.lints]
+
+[package.metadata.crucible]
+phase = "3"
+tier = "self-host-enterprise"

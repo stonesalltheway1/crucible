@@ -1,0 +1,6 @@
+apiVersion: v2
+name: control-plane
+description: Crucible Control Plane (task router, plan builder, budget enforcer, model router)
+type: application
+version: 2026.6.0
+appVersion: "2026.06.0"

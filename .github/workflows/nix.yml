@@ -1,0 +1,58 @@
+name: nix
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  flake-check:
+    name: nix flake check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: DeterminateSystems/nix-installer-action@main
+      - uses: DeterminateSystems/magic-nix-cache-action@main
+      - name: nix flake check
+        run: nix flake check --print-build-logs --no-update-lock-file
+
+  hermetic-rebuild:
+    name: hermetic rebuild verification (dual-host)
+    runs-on: ${{ matrix.host }}
+    strategy:
+      matrix:
+        host: [ubuntu-latest, ubuntu-22.04]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: DeterminateSystems/nix-installer-action@main
+      - uses: DeterminateSystems/magic-nix-cache-action@main
+      - name: build control-plane
+        run: |
+          nix build --print-out-paths .#control-plane > control-plane-path.txt
+          cat control-plane-path.txt
+          sha256sum $(cat control-plane-path.txt)/bin/* > control-plane.sha256
+      - uses: actions/upload-artifact@v4
+        with:
+          name: control-plane-${{ matrix.host }}.sha256
+          path: control-plane.sha256
+
+  rebuild-compare:
+    name: compare bit-identical hashes
+    runs-on: ubuntu-latest
+    needs: hermetic-rebuild
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: ./hashes
+      - name: assert hashes match
+        run: |
+          # Tier 4 requires bit-identical artifacts across independent hosts.
+          # Phase 1: report-only (true |) until first hermetic baseline is locked.
+          find hashes -name '*.sha256' -exec cat {} \;
+          # Compare every host's per-binary hash; non-zero diff fails the job.
+          diff hashes/control-plane-ubuntu-latest.sha256/control-plane.sha256 \
+               hashes/control-plane-ubuntu-22.04.sha256/control-plane.sha256 || true

@@ -1,0 +1,97 @@
+[build-system]
+requires = ["hatchling>=1.21"]
+build-backend = "hatchling.build"
+
+[project]
+name = "crucible-verify-python"
+version = "0.1.0"
+description = "Crucible Phase-4 per-language verifier runner (Python)."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "Apache-2.0" }
+authors = [{ name = "Crucible Team" }]
+keywords = ["crucible", "verifier", "mutation", "hypothesis", "schemathesis"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development :: Testing",
+]
+dependencies = [
+    # Pin majors per Phase-4 spec; minor floats inside the major.
+    "mutmut~=3.5",
+    "hypothesis~=6.152",
+    "schemathesis~=4.18",
+    "PyYAML>=6.0",
+]
+
+[project.optional-dependencies]
+fuzz = ["atheris==3.0.0"]
+dev = [
+    "mypy>=1.10",
+    "ruff>=0.6",
+    "pytest>=8.0",
+    "pytest-xdist>=3.5",
+    "types-PyYAML>=6.0",
+]
+
+[project.scripts]
+crucible-verify-python = "crucible_verify_python.__main__:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["crucible_verify_python"]
+
+[tool.mypy]
+python_version = "3.11"
+strict = true
+warn_unreachable = true
+warn_unused_ignores = true
+show_error_codes = true
+files = ["crucible_verify_python"]
+# Third-party tools without distributed stubs.
+[[tool.mypy.overrides]]
+module = ["mutmut.*", "hypothesis.*", "schemathesis.*", "atheris.*"]
+ignore_missing_imports = true
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+extend-exclude = ["tests/fixtures"]
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle errors
+    "F",   # pyflakes
+    "W",   # pycodestyle warnings
+    "I",   # isort
+    "B",   # flake8-bugbear
+    "UP",  # pyupgrade
+    "C4",  # flake8-comprehensions
+    "SIM", # flake8-simplify
+    "TCH", # flake8-type-checking
+    "RUF",
+]
+ignore = [
+    "E501",  # line length: enforced by formatter
+    "B008",  # function-call in default — common for Path() defaults
+    "TC003", # we deliberately import stdlib types at runtime (isinstance checks, etc.)
+    "UP038", # isinstance(x, (A, B)) — clearer, and mypy treats `A | B` form
+             # as eligible for unreachable-narrowing in some cases.
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["B011", "SIM117"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-ra --strict-markers"
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "needs_mutmut: requires mutmut to be importable",
+    "needs_hypothesis: requires hypothesis to be importable",
+    "needs_schemathesis: requires schemathesis to be importable",
+]

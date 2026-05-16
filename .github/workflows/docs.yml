@@ -1,0 +1,43 @@
+name: docs
+
+on:
+  push:
+    branches: [main]
+    paths: ['docs/**', '.github/workflows/docs.yml']
+  pull_request:
+    paths: ['docs/**']
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: docs
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate Mintlify config
+        uses: mintlify/validate-action@v1
+        with:
+          path: docs
+      - name: Build docs site
+        run: |
+          npx -y mintlify@latest dev --build docs
+
+  deploy:
+    needs: build
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    environment: docs-production
+    steps:
+      - uses: actions/checkout@v4
+      - name: Deploy via Mintlify
+        env:
+          MINTLIFY_TOKEN: ${{ secrets.MINTLIFY_TOKEN }}
+        run: |
+          npx -y mintlify@latest deploy --token "$MINTLIFY_TOKEN" --path docs

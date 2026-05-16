@@ -1,0 +1,44 @@
+{
+  "uid": "crucible-verifier",
+  "title": "Crucible — Verifier health",
+  "tags": ["crucible", "kpi", "verifier"],
+  "schemaVersion": 39,
+  "time": { "from": "now-24h", "to": "now" },
+  "panels": [
+    {
+      "title": "Tier 0 mutation kill rate — target ≥ 85%",
+      "type": "timeseries",
+      "datasource": { "type": "prometheus" },
+      "gridPos": { "x": 0, "y": 0, "w": 12, "h": 6 },
+      "targets": [{ "expr": "avg(crucible_verifier_tier0_kill_rate)" }]
+    },
+    {
+      "title": "Tier 1 PBT counterexample rate — target < 5%",
+      "type": "timeseries",
+      "datasource": { "type": "prometheus" },
+      "gridPos": { "x": 12, "y": 0, "w": 12, "h": 6 },
+      "targets": [{ "expr": "rate(crucible_verifier_pbt_counterexamples_total[1h]) / rate(crucible_verifier_pbt_runs_total[1h])" }]
+    },
+    {
+      "title": "Tier 3 proof timeout rate — target < 10%",
+      "type": "timeseries",
+      "datasource": { "type": "prometheus" },
+      "gridPos": { "x": 0, "y": 6, "w": 12, "h": 6 },
+      "targets": [{ "expr": "rate(crucible_verifier_tier3_timeouts_total[1h]) / rate(crucible_verifier_tier3_attempts_total[1h])" }]
+    },
+    {
+      "title": "Verifier disagreement with human reviewer (shadow) — target < 15%",
+      "type": "timeseries",
+      "datasource": { "type": "prometheus" },
+      "gridPos": { "x": 12, "y": 6, "w": 12, "h": 6 },
+      "targets": [{ "expr": "rate(crucible_verifier_human_disagreement_total[24h]) / rate(crucible_verifier_decisions_total[24h])" }]
+    },
+    {
+      "title": "Reject → reflect → pass rate — target ≥ 70%",
+      "type": "stat",
+      "datasource": { "type": "prometheus" },
+      "gridPos": { "x": 0, "y": 12, "w": 24, "h": 5 },
+      "targets": [{ "expr": "rate(crucible_verifier_reflect_then_pass_total[24h]) / rate(crucible_verifier_rejections_total[24h])" }]
+    }
+  ]
+}

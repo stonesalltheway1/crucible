@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://crucible.dev/memory/InferredAgentsMd/v1",
+  "title": "InferredAgentsMd",
+  "description": "Cartographer-generated AGENTS.md proposal for fresh repos. Customer reviews/edits in the web console; edits are persisted as repo_overrides.",
+  "type": "object",
+  "required": ["tenant_id", "repo", "content_markdown", "rule_count", "generated_at"],
+  "properties": {
+    "tenant_id":       { "type": "string" },
+    "repo":            { "type": "string" },
+    "job_id":          { "type": "string" },
+    "content_markdown":{ "type": "string", "minLength": 1 },
+    "rule_count":      { "type": "integer", "minimum": 0 },
+    "source_summary":  { "type": "string" },
+    "generated_at":    { "type": "string", "format": "date-time" },
+    "review_status": {
+      "type": "string",
+      "enum": ["draft", "presented", "accepted", "edited", "rejected"]
+    },
+    "reviewer_oidc_subject": { "type": "string" },
+    "reviewed_at":     { "type": "string", "format": "date-time" }
+  },
+  "additionalProperties": false
+}

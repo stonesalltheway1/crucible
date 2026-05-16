@@ -1,0 +1,145 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/twin-runtime-proto",
+    "crates/twin-runtime-shim",
+    "crates/twin-runtime-sandbox",
+    "crates/twin-runtime-fs",
+    "crates/twin-runtime-egress",
+    "crates/twin-runtime-lifecycle",
+    "crates/twin-runtime-attest",
+    "crates/twin-runtime-server",
+    "crates/twin-runtime-wasm",
+    "crates/twin-runtime-staleness",
+]
+
+# Centralised dependency versions — every member crate references these via
+# `dep = { workspace = true }`. This keeps the toolchain hermetic.
+[workspace.package]
+edition = "2021"
+rust-version = "1.82"
+license = "Apache-2.0"
+repository = "https://github.com/crucible/crucible"
+version = "2026.6.0-phase2"
+
+[workspace.dependencies]
+# Core async + error.
+tokio = { version = "1", features = ["full"] }
+async-trait = "0.1"
+thiserror = "2"
+anyhow = "1"
+futures = "0.3"
+bytes = "1"
+
+# Tracing + observability.
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter", "json", "registry", "fmt"] }
+tracing-opentelemetry = "0.27"
+opentelemetry = "0.26"
+opentelemetry_sdk = "0.26"
+opentelemetry-otlp = "0.26"
+
+# Serialisation.
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+serde_yaml = "0.9"
+toml = "0.8"
+
+# Time.
+chrono = { version = "0.4", default-features = false, features = ["serde", "clock"] }
+humantime-serde = "1"
+
+# Hashing + crypto.
+sha2 = "0.10"
+hex = "0.4"
+ed25519-dalek = { version = "2", features = ["rand_core"] }
+rand = "0.8"
+rand_core = "0.6"
+
+# gRPC + proto.
+tonic = { version = "0.12", features = ["tls", "transport"] }
+tonic-build = "0.12"
+prost = "0.13"
+prost-types = "0.13"
+
+# HTTP client (for E2B REST, Neon REST).
+reqwest = { version = "0.12", default-features = false, features = ["json", "rustls-tls", "stream"] }
+url = "2"
+
+# Filesystem + process.
+tempfile = "3"
+fs-err = "3"
+
+# Property testing + fuzz.
+proptest = "1.5"
+arbitrary = { version = "1", features = ["derive"] }
+
+# In-crate testing.
+mockall = "0.13"
+wiremock = "0.6"
+pretty_assertions = "1"
+
+# Sandbox spec (the trait).
+crucible-sandbox-spec = { path = "../../libs/sandbox-spec" }
+
+# Phase 3: WASM tool runner (Wasmtime — feature set vetted in the May 2026
+# currency check). Pinned to the 31.x line; we do NOT enable the `threads`
+# feature because WASI Preview 2 doesn't ship thread support until P3.
+wasmtime = { version = "31", default-features = false, features = [
+    "runtime",
+    "cranelift",
+    "pooling-allocator",
+    "async",
+    "parallel-compilation",
+    "component-model",
+    "addr2line",
+    "demangle",
+    "coredump",
+    "wat",
+] }
+wasmtime-wasi = "31"
+wat = "1"
+
+# Member crates (referenced by twin-runtime-server).
+twin-runtime-proto = { path = "crates/twin-runtime-proto" }
+twin-runtime-shim = { path = "crates/twin-runtime-shim" }
+twin-runtime-sandbox = { path = "crates/twin-runtime-sandbox" }
+twin-runtime-fs = { path = "crates/twin-runtime-fs" }
+twin-runtime-egress = { path = "crates/twin-runtime-egress" }
+twin-runtime-lifecycle = { path = "crates/twin-runtime-lifecycle" }
+twin-runtime-attest = { path = "crates/twin-runtime-attest" }
+
+# Linux-only crates. We feature-gate them so non-Linux developer hosts
+# (macOS, Windows) can still `cargo check` the workspace.
+nix = { version = "0.29", features = ["sched", "process", "signal", "fs", "user", "socket"] }
+libc = "0.2"
+caps = "0.5"
+landlock = "0.4"
+
+[profile.release]
+codegen-units = 1
+lto = "fat"
+panic = "abort"
+strip = "symbols"
+
+[profile.dev]
+debug = 1
+opt-level = 0
+
+# Optimised build for the shim — the brand promise must be fast.
+[profile.release.package.twin-runtime-shim]
+opt-level = 3
+
+[workspace.lints.rust]
+unsafe_op_in_unsafe_fn = "warn"
+missing_docs = "warn"
+
+[workspace.lints.clippy]
+pedantic = { level = "warn", priority = -1 }
+nursery = { level = "warn", priority = -1 }
+# We accept these patterns deliberately.
+module_name_repetitions = "allow"
+missing_errors_doc = "allow"
+missing_panics_doc = "allow"
+needless_pass_by_value = "allow"
+must_use_candidate = "allow"

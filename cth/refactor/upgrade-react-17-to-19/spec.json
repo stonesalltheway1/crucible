@@ -1,0 +1,9 @@
+{
+  "description": "Upgrade a CRA-style React 17 SPA to React 19.",
+  "stack": "nextjs",
+  "task_description": "The repo is React 17 with class components. Upgrade to React 19, convert top-level App to function components + hooks, keep snapshot/Vitest tests passing. Use the React-19 codemods where appropriate. Avoid changes to behaviour.",
+  "budget_usd_max": 5.00,
+  "wall_clock_min_max": 40,
+  "expect_verifier_verdict": "approved",
+  "assert_no_security_incidents": true
+}

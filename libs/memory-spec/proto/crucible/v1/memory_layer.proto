@@ -1,0 +1,162 @@
+syntax = "proto3";
+
+package crucible.v1;
+
+import "google/protobuf/timestamp.proto";
+import "crucible/v1/common.proto";
+import "crucible/v1/memory.proto";
+
+option go_package = "github.com/crucible/memory-spec/gen/crucible/v1;memoryv1";
+
+// MemoryLayer is the three-tier layering used by the retrieval router.
+// Reads are bottom-up; writes are constrained by the writer's layer.
+enum MemoryLayer {
+  MEMORY_LAYER_UNSPECIFIED = 0;
+  // global_defaults: read-only OSS-derived bundles installed at fresh
+  // tenant provision. Shared across tenants; never carries
+  // customer-private data.
+  MEMORY_LAYER_GLOBAL_DEFAULTS = 1;
+  // org_overrides: tenant-private. Owner = the tenant; readable only by
+  // that tenant.
+  MEMORY_LAYER_ORG_OVERRIDES = 2;
+  // repo_overrides: lowest layer. Per-repo, tenant-private. Cartographer
+  // outputs land here; customer-edited AGENTS.md/CLAUDE.md/.cursorrules
+  // also live here.
+  MEMORY_LAYER_REPO_OVERRIDES = 3;
+}
+
+// ConventionTaxonomy enumerates the 12 canonical categories from
+// docs/01-architecture/memory-layer.md §"Convention taxonomy".
+//
+// Distillers MUST extract into one of these buckets; an extraction with
+// category="other" is rejected at admission.
+enum ConventionTaxonomy {
+  CONVENTION_TAXONOMY_UNSPECIFIED = 0;
+  CONVENTION_TAXONOMY_NAMING = 1;
+  CONVENTION_TAXONOMY_LAYERING = 2;
+  CONVENTION_TAXONOMY_LIBRARY_PREFERENCES = 3;
+  CONVENTION_TAXONOMY_TEST_PATTERNS = 4;
+  CONVENTION_TAXONOMY_ERROR_HANDLING = 5;
+  CONVENTION_TAXONOMY_LOGGING = 6;
+  CONVENTION_TAXONOMY_MIGRATION_PATTERNS = 7;
+  CONVENTION_TAXONOMY_PR_COMMIT_HYGIENE = 8;
+  CONVENTION_TAXONOMY_SECURITY_DEFAULTS = 9;
+  CONVENTION_TAXONOMY_PERFORMANCE_DEFAULTS = 10;
+  CONVENTION_TAXONOMY_CONCURRENCY = 11;
+  CONVENTION_TAXONOMY_API_SHAPE = 12;
+}
+
+// RetrievalQuery is the input to the memory-router's hybrid retrieval.
+// Per-tenant scoping is enforced server-side; the client cannot opt out.
+message RetrievalQuery {
+  string tenant_id = 1;
+  string task_id = 2;
+  string query = 3;
+  ScopeFilter scope = 4;
+  uint32 max_tokens = 5;             // default 7000
+  uint32 max_items = 6;              // default 32
+  bool include_episodic = 7;         // pgvector
+  bool include_semantic = 8;         // pgvector
+  bool include_procedural = 9;       // FalkorDB
+  bool include_hot = 10;             // Redis
+}
+
+// RetrievalResult is the response. Memories carry their layer of origin so
+// callers can reason about provenance.
+message RetrievalResult {
+  repeated ScoredMemory memories = 1;
+  uint32 tokens_used = 2;
+  uint32 budget_tokens = 3;
+  uint32 items_considered = 4;
+  uint32 items_returned = 5;
+  uint32 latency_ms = 6;
+}
+
+// ScoredMemory wraps a Memory with the A-MAC importance score that
+// caused it to surface, plus its layer of origin.
+message ScoredMemory {
+  Memory memory = 1;
+  MemoryLayer layer = 2;
+  double semantic_score = 3;         // raw similarity (cosine, 0..1)
+  double importance_score = 4;       // A-MAC composite
+  double final_score = 5;            // semantic × importance, post re-rank
+  uint32 token_estimate = 6;
+}
+
+// ConventionCandidate is a distiller's extraction before admission. The
+// LLM-as-judge filter scores these; admission requires judge_score >= 0.5
+// AND cross_source_agreement >= 0.4 (configurable in production).
+message ConventionCandidate {
+  string id = 1;                     // cand_<ulid>
+  string tenant_id = 2;
+  ScopeFilter scope = 3;
+  string rule_nl = 4;
+  ConventionTaxonomy category = 5;
+  string rationale = 6;
+  string evidence_quote = 7;
+  repeated SourceRef source_evidence = 8;
+  double judge_score = 9;            // LLM-as-judge filter [0..1]
+  string judge_rationale = 10;
+  bool judge_quarantined = 11;       // true means rejected by judge
+  string judge_quarantine_reason = 12;
+  double cross_source_agreement = 13;
+  uint32 cross_source_count = 14;
+  google.protobuf.Timestamp extracted_at = 15;
+  string extractor_model = 16;       // e.g. "claude-haiku-4-5-20251001"
+  string source_channel = 17;        // "github_pr"|"incident"|"adr"|...
+  // If admission would create a duplicate, the existing convention_id.
+  string would_supersede = 18;
+}
+
+// ConventionDrift is emitted by the drift detector whenever an active
+// convention's 30-day pos/neg ratio falls below threshold.
+message ConventionDrift {
+  string convention_id = 1;
+  string tenant_id = 2;
+  uint32 positives_30d = 3;
+  uint32 negatives_30d = 4;
+  double ratio = 5;                  // pos / max(neg, 1)
+  double threshold = 6;              // default 1.5
+  google.protobuf.Timestamp detected_at = 7;
+  string suggested_action = 8;       // "demote"|"supersede"|"archive"
+}
+
+// AdmissionScore is the multi-dimensional A-MAC score computed when the
+// admission controller decides whether to admit a candidate.
+// utility × confidence × novelty × recency × content_prior.
+message AdmissionScore {
+  double utility = 1;
+  double confidence = 2;
+  double novelty = 3;
+  double recency = 4;
+  double content_prior = 5;
+  double composite = 6;              // product of the above, normalized
+  bool admitted = 7;
+  string admission_threshold_label = 8;  // "active"|"suggested"|"candidate"
+}
+
+// FederationGraduation records when an org-scoped rule satisfies the
+// ≥5-tenant + categorical-form policy and graduates upward.
+//
+// Phase 5 wires the data model only. The actual graduation engine fires
+// in v2 Phase 10.
+message FederationGraduation {
+  string anonymized_rule_id = 1;     // hash of categorical form
+  ConventionTaxonomy category = 2;
+  string canonical_form_nl = 3;
+  uint32 distinct_tenant_count = 4;
+  repeated string contributing_convention_ids = 5;
+  google.protobuf.Timestamp eligible_at = 6;
+  bool fired = 7;                    // false in Phase 5; flips in v2
+  string promoted_to_layer = 8;      // "global_defaults" when fired
+}
+
+// HotMemoryEntry is the Redis-tier transient record.
+message HotMemoryEntry {
+  string key = 1;
+  string content = 2;
+  string task_id = 3;
+  string tenant_id = 4;
+  uint32 ttl_seconds = 5;
+  google.protobuf.Timestamp written_at = 6;
+}

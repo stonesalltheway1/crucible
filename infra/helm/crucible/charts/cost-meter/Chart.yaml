@@ -1,0 +1,6 @@
+apiVersion: v2
+name: cost-meter
+description: Crucible cost meter (per-task USD + token telemetry).
+type: application
+version: 2026.6.0
+appVersion: "2026.06.0"

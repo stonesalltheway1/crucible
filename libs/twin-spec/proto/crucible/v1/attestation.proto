@@ -1,0 +1,267 @@
+syntax = "proto3";
+
+package crucible.v1;
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/struct.proto";
+import "crucible/v1/common.proto";
+import "crucible/v1/verification.proto";
+
+option go_package = "github.com/crucible/sdk-go/gen/crucible/v1;cruciblev1";
+
+// All Crucible attestations are in-toto Statement v1 wrappers.
+// The Statement carries `subject`, `predicateType`, and `predicate`. The
+// `predicate` payload is one of the typed messages below, serialized as JSON
+// and embedded in the DSSE envelope.
+//
+// Predicate type URIs are namespaced under https://crucible.dev/<type>/v1.
+
+// InTotoStatement is the minimal envelope-shape we ship to Sigstore Rekor.
+message InTotoStatement {
+  string type = 1;                     // "https://in-toto.io/Statement/v1"
+  repeated Subject subject = 2;
+  string predicate_type = 3;
+  google.protobuf.Struct predicate = 4;
+
+  message Subject {
+    string name = 1;
+    map<string, string> digest = 2;    // alg -> hex digest, e.g. {"sha256":"..."}
+  }
+}
+
+// DsseEnvelope mirrors the on-the-wire DSSE format.
+message DsseEnvelope {
+  string payload_type = 1;             // "application/vnd.in-toto+json"
+  string payload = 2;                  // base64-encoded InTotoStatement JSON
+  repeated Signature signatures = 3;
+
+  message Signature {
+    string keyid = 1;
+    string sig = 2;                    // base64 signature bytes
+    string cert = 3;                   // base64 x509 cert from Fulcio (when keyless)
+  }
+}
+
+// ─── PREDICATE TYPES ────────────────────────────────────────────────────────
+
+// WriteAttestation — every twin.fs.write / twin.fs.delete.
+// predicateType = https://crucible.dev/WriteAttestation/v1
+message WriteAttestation {
+  string task_id = 1;
+  string step_id = 2;
+  string tenant_id = 3;
+  string repo = 4;
+  string base_sha = 5;
+  string path = 6;
+  FileChange.Action action = 7;
+  string content_sha256 = 8;
+  uint64 size_bytes = 9;
+  google.protobuf.Timestamp timestamp = 10;
+  string agent_oidc_subject = 11;
+}
+
+// MigrationAttestation — every twin.db.migrate.
+// predicateType = https://crucible.dev/MigrationAttestation/v1
+message MigrationAttestation {
+  string task_id = 1;
+  string tenant_id = 2;
+  string migration_file = 3;
+  string migration_sha256 = 4;
+  SchemaDiff schema_diff = 5;
+  map<string, string> row_count_change = 6;
+  google.protobuf.Timestamp applied_at = 7;
+  string neon_branch_id = 8;
+  string agent_oidc_subject = 9;
+
+  message SchemaDiff {
+    repeated string added_tables = 1;
+    repeated string modified_tables = 2;
+    repeated string dropped_tables = 3;
+    repeated string added_columns = 4;
+    bool destructive_ddl = 5;
+  }
+}
+
+// ServiceCallAttestation — every twin.svc.call.
+// predicateType = https://crucible.dev/ServiceCallAttestation/v1
+message ServiceCallAttestation {
+  string task_id = 1;
+  string tenant_id = 2;
+  string service = 3;
+  string endpoint = 4;
+  string method = 5;
+  string request_hash = 6;
+  string response_hash = 7;
+  string tape_disposition = 8;
+  string x_crucible_tape = 9;
+  uint64 duration_ms = 10;
+  repeated string secrets_used = 11;
+  string agent_oidc_subject = 12;
+}
+
+// DestructiveProposalAttestation — emitted when syscall shim intercepts.
+// predicateType = https://crucible.dev/DestructiveProposal/v1
+message DestructiveProposalAttestation {
+  string task_id = 1;
+  string tenant_id = 2;
+  string command = 3;
+  string scope = 4;                    // "twin" | "real"
+  string justification = 5;
+  BlastRadius blast_radius = 6;
+  string intercepted_at_layer = 7;
+  string agent_oidc_subject = 8;
+  google.protobuf.Timestamp at = 9;
+}
+
+// DestructiveApprovalAttestation — twin-auto or human-real.
+// predicateType = https://crucible.dev/DestructiveApproval/v1
+message DestructiveApprovalAttestation {
+  string proposal_attestation = 1;     // rekor UUID
+  ApprovalKind approval_kind = 2;
+  string approver_oidc_subject = 3;
+  google.protobuf.Timestamp approved_at = 4;
+  string approval_attestation_id = 5;
+
+  enum ApprovalKind {
+    APPROVAL_KIND_UNSPECIFIED = 0;
+    APPROVAL_KIND_AUTO_TWIN = 1;
+    APPROVAL_KIND_HUMAN_REAL = 2;
+  }
+}
+
+// TestReportAttestation — twin.test.* and verifier per-tier methods.
+// predicateType = https://crucible.dev/TestReport/v1
+message TestReportAttestation {
+  string task_id = 1;
+  TestKind test_kind = 2;
+  string framework = 3;
+  bool passed = 4;
+  Stats stats = 5;
+  double duration_seconds = 6;
+  string verifier_model = 7;
+  string verifier_oidc_subject = 8;
+
+  enum TestKind {
+    TEST_KIND_UNSPECIFIED = 0;
+    TEST_KIND_TIER_0_MUTATION = 1;
+    TEST_KIND_TIER_1_PBT = 2;
+    TEST_KIND_TIER_2_CONTRACT = 3;
+    TEST_KIND_TIER_3_PROOF = 4;
+    TEST_KIND_TIER_4_HONEST_CI = 5;
+    TEST_KIND_PROJECT_NATIVE = 6;
+  }
+
+  message Stats {
+    uint32 killed = 1;
+    uint32 survived = 2;
+    double score = 3;
+    uint32 iterations = 4;
+    repeated string counterexamples = 5;
+  }
+}
+
+// VerifierApprovalAttestation / VerifierRejectionAttestation: see verification.proto.
+
+// PlanProposalAttestation — emitted when the Plan Builder produces a plan.
+// predicateType = https://crucible.dev/PlanProposal/v1
+message PlanProposalAttestation {
+  string task_id = 1;
+  string tenant_id = 2;
+  string plan_hash = 3;
+  double estimated_cost_usd = 4;
+  uint32 estimated_duration_min = 5;
+  Complexity complexity = 6;
+  uint32 step_count = 7;
+  string built_by_oidc = 8;
+  google.protobuf.Timestamp built_at = 9;
+}
+
+// PlanApprovalAttestation — user-approves a plan.
+// predicateType = https://crucible.dev/PlanApproval/v1
+message PlanApprovalAttestation {
+  string task_id = 1;
+  string plan_hash = 2;
+  double estimated_cost_usd = 3;
+  string approved_by_oidc = 4;
+  google.protobuf.Timestamp approved_at = 5;
+}
+
+// PromotionBundleAttestation — the bundle submitted to the Promotion Contract.
+// predicateType = https://crucible.dev/PromotionBundle/v1
+message PromotionBundleAttestation {
+  string task_id = 1;
+  string diff_hash = 2;
+  string verifier_approval_attestation = 3;
+  repeated FileChange files_changed = 4;
+  string build_provenance_attestation = 5;
+  string rebuild_hash = 6;
+  BlastRadius blast_radius = 7;
+  SuggestedRollout suggested_rollout = 8;
+  string agent_oidc_subject = 9;
+  google.protobuf.Timestamp signed_at = 10;
+}
+
+// PromotionApprovalAttestation — after policy + human approval.
+// predicateType = https://crucible.dev/PromotionApproval/v1
+message PromotionApprovalAttestation {
+  string bundle_attestation = 1;
+  string policy_decision = 2;          // "auto-approve" | "human-approved"
+  string rego_policy_hash = 3;
+  google.protobuf.Struct rego_decision_doc = 4;
+  repeated string human_approver_oidc_subjects = 5;
+  string kms_signing_key_arn = 6;
+  string lease_id = 7;
+  google.protobuf.Timestamp approved_at = 8;
+}
+
+// PromotionOutcomeAttestation — final outcome.
+// predicateType = https://crucible.dev/PromotionOutcome/v1
+message PromotionOutcomeAttestation {
+  string promotion_id = 1;
+  string bundle_attestation = 2;
+  Outcome outcome = 3;
+  repeated RolloutStep rollout_steps = 4;
+  string final_state = 5;
+  string rollback_reason = 6;
+  google.protobuf.Timestamp completed_at = 7;
+
+  enum Outcome {
+    OUTCOME_UNSPECIFIED = 0;
+    OUTCOME_LANDED = 1;
+    OUTCOME_ROLLED_BACK = 2;
+    OUTCOME_APPROVAL_TIMEOUT = 3;
+    OUTCOME_POLICY_DENIED = 4;
+  }
+
+  message RolloutStep {
+    uint32 weight = 1;
+    uint32 dwell_seconds = 2;
+    string slo_check = 3;
+    google.protobuf.Timestamp at = 4;
+  }
+}
+
+// MemoryWriteAttestation — agent or distiller writes a procedural rule.
+// predicateType = https://crucible.dev/MemoryWrite/v1
+message MemoryWriteAttestation {
+  string convention_id = 1;
+  string tenant_id = 2;
+  ScopeFilter scope = 3;
+  string rule_nl = 4;
+  string category = 5;
+  repeated SourceRef source_evidence = 6;
+  double confidence = 7;
+  double judge_score = 8;
+  string writer_oidc_subject = 9;
+  google.protobuf.Timestamp written_at = 10;
+}
+
+// RekorEntry is the receipt we get back when publishing.
+message RekorEntry {
+  string uuid = 1;
+  string log_index = 2;
+  string log_id = 3;                   // tree id
+  string integrated_time = 4;
+  string url = 5;                      // e.g. https://rekor.sigstore.dev/api/v1/log/entries/<uuid>
+  bool local_journal_fallback = 6;     // true if Rekor publish was bypassed
+}

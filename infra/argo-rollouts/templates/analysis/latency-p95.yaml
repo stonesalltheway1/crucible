@@ -1,0 +1,30 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AnalysisTemplate
+metadata:
+  name: crucible-slo-latency-p95
+  labels:
+    crucible.io/owner: promotion-gate
+spec:
+  args:
+    - name: service-name
+    - name: promotion-id
+    - name: baseline-latency-ms
+      value: "200"
+    - name: regression-multiplier
+      value: "1.3"
+  metrics:
+    - name: latency-p95
+      interval: 1m
+      count: 5
+      failureLimit: 1
+      successCondition: result[0] < ({{args.baseline-latency-ms}} * {{args.regression-multiplier}})
+      provider:
+        prometheus:
+          address: http://prometheus.observability.svc.cluster.local:9090
+          query: |
+            histogram_quantile(0.95,
+              sum(rate(http_request_duration_milliseconds_bucket{
+                service="{{args.service-name}}",
+                crucible_promotion_id="{{args.promotion-id}}"
+              }[5m])) by (le)
+            )

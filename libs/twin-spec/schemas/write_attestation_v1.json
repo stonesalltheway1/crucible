@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://crucible.dev/WriteAttestation/v1",
+  "title": "WriteAttestation",
+  "type": "object",
+  "required": ["task_id", "tenant_id", "repo", "base_sha", "path", "action", "content_sha256", "size_bytes", "timestamp", "agent_oidc_subject"],
+  "properties": {
+    "task_id":             { "type": "string", "pattern": "^task_[0-9A-HJKMNP-TV-Z]{26}$" },
+    "step_id":             { "type": "string" },
+    "tenant_id":           { "type": "string" },
+    "repo":                { "type": "string" },
+    "base_sha":            { "type": "string", "pattern": "^[0-9a-f]{7,64}$" },
+    "path":                { "type": "string", "minLength": 1 },
+    "action":              { "type": "string", "enum": ["add", "modify", "delete"] },
+    "content_sha256":      { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "size_bytes":          { "type": "integer", "minimum": 0 },
+    "timestamp":           { "type": "string", "format": "date-time" },
+    "agent_oidc_subject":  { "type": "string", "format": "uri" }
+  },
+  "additionalProperties": false
+}

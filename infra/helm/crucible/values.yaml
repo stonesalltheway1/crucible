@@ -1,0 +1,201 @@
+# Crucible umbrella values.yaml.
+#
+# This is the SaaS-on-VPC default. For air-gap, layer
+# values-airgap-default.yaml on top. For per-cloud variants, layer the
+# matching values-<cloud>.yaml on top.
+#
+# Every sub-chart inherits the global block under .Values.crucible.
+
+global:
+  imagePullSecrets: []
+  # Image registry. Override per cloud (e.g. ECR/GCR/ACR) or per
+  # air-gap deployment (your local OCI registry).
+  imageRegistry: ghcr.io/crucible
+  imageTag: 2026.06.0
+  # Domain the web console + SSO callbacks bind to.
+  domain: crucible.example.com
+  storageClass: ""
+  serviceMonitor:
+    enabled: true
+
+crucible:
+  topology: vpc            # vpc | airgap | hybrid
+  edition: enterprise      # community | enterprise
+  acceptEULA: false        # MUST be true at install for enterprise images.
+
+  # ------- Storage -------
+  postgres:
+    host: postgres.internal
+    port: 5432
+    database: crucible
+    sslMode: require
+    credentialsSecret: crucible-pg
+  redis:
+    host: redis.internal
+    port: 6379
+    cluster: true
+  falkordb:
+    host: falkordb.internal
+    port: 6379
+    cluster: false
+  objectStorage:
+    type: s3
+    endpoint: s3.amazonaws.com
+    bucket: ""
+    credentialsSecret: crucible-s3
+
+  # ------- Twin Runtime -------
+  twinRuntime:
+    sandboxProvider: e2b           # e2b | firecracker-local
+    e2bApiKeySecret: e2b-api-key
+    firecrackerPoolSize: 100
+    selfHost:
+      zfsPoolRoot: /var/lib/crucible/zfs
+      cgroupParent: /sys/fs/cgroup/crucible
+      tetragonPolicyDir: /var/run/tetragon/policies.d
+      firecrackerBinary: /usr/local/bin/firecracker
+
+  # ------- PII Scrub -------
+  tapeScrubber:
+    url: http://crucible-tape-scrubber.crucible-system.svc.cluster.local:9100
+    tokenSecret: crucible-scrubber-token
+    ff3MasterKeySecret: crucible-scrubber-ff3-key
+    engine: default
+    failClosed: true
+
+  # ------- Shadow recorder -------
+  shadowRecorder:
+    enabled: true
+    ingress: envoy
+    tapeBucket: ""
+    recordSchedule: monthly
+    retentionDays: 90
+
+  # ------- KMS / signing -------
+  kms:
+    provider: aws-kms     # aws-kms | gcp-cloud-hsm | yubihsm | softhsm | azure-keyvault
+    keyRef: ""
+
+  # ------- Sigstore -------
+  sigstore:
+    mode: public           # public | self-hosted
+    rekorUrl: https://rekor.sigstore.dev
+    fulcioUrl: https://fulcio.sigstore.dev
+    trustedRoot: ""        # path on PV; empty = use bundled root
+
+  # ------- LLM routing -------
+  llmRouting:
+    tier0Provider: anthropic
+    tier1Provider: anthropic
+    tier2Provider: anthropic
+    verifierProvider: google
+    airgapLocalProvider: vllm
+    apiKeysSecret: crucible-llm-keys
+
+  # ------- Auth -------
+  auth:
+    provider: workos
+    samlMetadataUrl: ""
+    oidcDiscoveryUrl: ""
+    sessionSecret: crucible-session-secret
+
+  # ------- Observability -------
+  observability:
+    tracing:
+      exporter: otlp
+      endpoint: tempo.observability.svc:4317
+    metrics:
+      prometheusEndpoint: prometheus-server.observability.svc:9090
+    logs:
+      lokiEndpoint: loki.observability.svc:3100
+
+  # ------- Tenant defaults -------
+  defaults:
+    promotionPolicy: bundled
+    cartographer:
+      maxRepoSize: 5000000
+      modelTier: 1
+
+  # ------- Stripe billing (SaaS only) -------
+  billing:
+    enabled: true
+    mode: test                       # test | live; production flips at launch
+    secretKeyRef:
+      name: crucible-stripe
+      key: secret_key
+    webhookSecretRef:
+      name: crucible-stripe
+      key: webhook_secret
+
+  # ------- Network policies -------
+  networkPolicy:
+    enabled: true
+    egressAllowlist:
+      - api.anthropic.com
+      - generativelanguage.googleapis.com
+      - api.github.com
+      - api.openai.com
+
+# Per sub-chart toggles. Each sub-chart adds its own block here.
+control-plane:
+  enabled: true
+  replicas: 3
+  resources:
+    requests:
+      cpu: 1000m
+      memory: 2Gi
+    limits:
+      cpu: 4000m
+      memory: 8Gi
+
+twin-runtime:
+  enabled: true
+  replicas: 2
+
+verifier:
+  enabled: true
+  replicas: 3
+
+memory-router:
+  enabled: true
+  replicas: 3
+
+distiller:
+  enabled: true
+  replicas: 1
+
+cartographer:
+  enabled: true
+  replicas: 2
+
+shadow-recorder:
+  enabled: true
+  replicas: 1
+
+tape-scrubber:
+  enabled: true
+  replicas: 2
+
+promotion-gate:
+  enabled: true
+  replicas: 2
+
+attestation-relay:
+  enabled: true
+  replicas: 2
+
+cost-meter:
+  enabled: true
+  replicas: 2
+
+web-console:
+  enabled: true
+  replicas: 2
+
+github-app:
+  enabled: true
+  replicas: 2
+
+slack-bot:
+  enabled: true
+  replicas: 1

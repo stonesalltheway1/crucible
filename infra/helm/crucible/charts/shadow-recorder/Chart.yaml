@@ -1,0 +1,6 @@
+apiVersion: v2
+name: shadow-recorder
+description: Crucible shadow recorder (staging-traffic capture for tape population).
+type: application
+version: 2026.6.0
+appVersion: "2026.06.0"

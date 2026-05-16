@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://crucible.dev/VerifierRejection/v1",
+  "title": "VerifierRejection",
+  "type": "object",
+  "required": ["task_id", "diff_hash", "verdict", "rejection_reasons", "executor_oidc_subject", "verifier_oidc_subject", "signed_at"],
+  "properties": {
+    "task_id":               { "type": "string" },
+    "diff_hash":             { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "verdict":               { "type": "string", "enum": ["rejected"] },
+    "rejection_reasons": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["category", "detail"],
+        "properties": {
+          "category":      { "type": "string" },
+          "detail":        { "type": "string" },
+          "file":          { "type": "string" },
+          "line":          { "type": "integer", "minimum": 0 },
+          "suggested_fix": { "type": "string" }
+        }
+      }
+    },
+    "tier_results":          { "type": "object" },
+    "executor_oidc_subject": { "type": "string", "format": "uri" },
+    "verifier_oidc_subject": { "type": "string", "format": "uri" },
+    "signed_at":             { "type": "string", "format": "date-time" }
+  },
+  "additionalProperties": false
+}

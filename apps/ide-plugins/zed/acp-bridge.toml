@@ -1,0 +1,50 @@
+# ACP bridge configuration.
+#
+# Zed's Agent Client Protocol (ACP) host invokes Crucible's MCP server with
+# the same tool schemas. The mapping is 1:1; this file documents which MCP
+# tools are surfaced under which ACP names.
+#
+# See docs/03-sdk/tool-reference.md for the canonical schemas.
+
+[bridge]
+mcp_server = "crucible-mcp"
+acp_transport = "stdio"
+auth = "oauth_pkce"
+
+[tools]
+# File operations
+twin_fs_read    = { acp_name = "fs.read",    auth_required = true }
+twin_fs_write   = { acp_name = "fs.write",   auth_required = true, destructive = true }
+twin_fs_delete  = { acp_name = "fs.delete",  auth_required = true, destructive = true }
+twin_fs_list    = { acp_name = "fs.list",    auth_required = true }
+twin_fs_diff    = { acp_name = "fs.diff",    auth_required = true }
+
+# Database operations
+twin_db_query   = { acp_name = "db.query",   auth_required = true }
+twin_db_migrate = { acp_name = "db.migrate", auth_required = true, destructive = true }
+
+# Service operations
+twin_svc_call = { acp_name = "svc.call", auth_required = true }
+
+# Secrets — value never returned, injected server-side.
+twin_secret_use = { acp_name = "secret.use", auth_required = true }
+
+# Shell
+twin_shell_exec               = { acp_name = "shell.exec",     auth_required = true, destructive = true }
+twin_shell_approve_destructive = { acp_name = "shell.approve", auth_required = true, real_scope_requires_human = true }
+
+# Tests
+twin_test_run            = { acp_name = "test.run" }
+twin_test_run_mutation   = { acp_name = "test.mutation" }
+twin_test_run_property   = { acp_name = "test.property" }
+twin_test_run_fuzz       = { acp_name = "test.fuzz" }
+
+# Verifier + memory + plan + promote
+twin_verify_bundle           = { acp_name = "verify" }
+twin_memory_recall           = { acp_name = "memory.recall" }
+twin_memory_note             = { acp_name = "memory.note" }
+twin_memory_conventions      = { acp_name = "memory.conventions" }
+twin_memory_check_compliance = { acp_name = "memory.check" }
+twin_plan_propose            = { acp_name = "plan.propose", auth_required = true }
+twin_plan_check_budget       = { acp_name = "plan.budget" }
+twin_promote                 = { acp_name = "promote", auth_required = true, real_scope_requires_human = true }

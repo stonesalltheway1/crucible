@@ -1,0 +1,233 @@
+{
+  "bundle_version": "1",
+  "stack": "spring_boot",
+  "generated_at": "2026-05-15T20:10:06.824221Z",
+  "generator_commit": "",
+  "license": {
+    "safe_for_redistribution": true,
+    "input_licenses_seen": [
+      "Apache-2.0"
+    ],
+    "excluded_licenses": [],
+    "attribution_file": "THIRD_PARTY_SOURCES.md"
+  },
+  "stats": {
+    "repos_examined": 200,
+    "configs_parsed": 120,
+    "agents_md_parsed": 80,
+    "pr_comments_mined": 0,
+    "adrs_parsed": 0,
+    "raw_candidates": 36,
+    "post_judge": 12,
+    "post_agreement": 12,
+    "active_rules": 12,
+    "suggested_rules": 0,
+    "candidate_rules": 0
+  },
+  "conventions": [
+    {
+      "id": "conv_global_spring_boot_df7d507dd448437c",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "**/*.java"
+      },
+      "rule_nl": "Service classes end in `Service`; configs in `Config`.",
+      "category": "Naming",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.824221Z",
+      "written_at": "2026-05-15T20:10:06.824221Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.824221Z",
+      "stack_tag": "spring_boot"
+    },
+    {
+      "id": "conv_global_spring_boot_e563660612054159",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "src/main/java/**/*.java"
+      },
+      "rule_nl": "Domain classes don't import from `web/` or `api/`.",
+      "category": "Layering",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.824221Z",
+      "written_at": "2026-05-15T20:10:06.824221Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.824221Z",
+      "stack_tag": "spring_boot"
+    },
+    {
+      "id": "conv_global_spring_boot_34f3cc22583b4e6a",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "**/*.java"
+      },
+      "rule_nl": "Use `slf4j-api`; never `System.out.println` in production code.",
+      "category": "LibraryPreferences",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.824221Z",
+      "written_at": "2026-05-15T20:10:06.824221Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.824221Z",
+      "stack_tag": "spring_boot"
+    },
+    {
+      "id": "conv_global_spring_boot_64f4dbbf70d049e0",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "src/test/java/**/*.java"
+      },
+      "rule_nl": "JUnit 5 + `@SpringBootTest` for integration; unit tests free of Spring.",
+      "category": "TestPatterns",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.824221Z",
+      "written_at": "2026-05-15T20:10:06.824221Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.824221Z",
+      "stack_tag": "spring_boot"
+    },
+    {
+      "id": "conv_global_spring_boot_45d320cb89704932",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "**/*.java"
+      },
+      "rule_nl": "Use typed exceptions + `@ControllerAdvice` envelopes.",
+      "category": "ErrorHandling",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.824221Z",
+      "written_at": "2026-05-15T20:10:06.824221Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.824221Z",
+      "stack_tag": "spring_boot"
+    },
+    {
+      "id": "conv_global_spring_boot_604a8b3bbfb54d6f",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "**/*.java"
+      },
+      "rule_nl": "Use `Logger logger = LoggerFactory.getLogger(...)`; structured fields.",
+      "category": "Logging",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.824221Z",
+      "written_at": "2026-05-15T20:10:06.824221Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.824221Z",
+      "stack_tag": "spring_boot"
+    },
+    {
+      "id": "conv_global_spring_boot_eb3bb6368fe84ea8",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "src/main/resources/db/migration/**/*.sql"
+      },
+      "rule_nl": "Flyway migrations are additive-only.",
+      "category": "MigrationPatterns",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.824221Z",
+      "written_at": "2026-05-15T20:10:06.824221Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.824221Z",
+      "stack_tag": "spring_boot"
+    },
+    {
+      "id": "conv_global_spring_boot_030906e42ca4451a",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "*"
+      },
+      "rule_nl": "Conventional Commits + Google Java Format.",
+      "category": "PrCommitHygiene",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.824221Z",
+      "written_at": "2026-05-15T20:10:06.824221Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.824221Z",
+      "stack_tag": "spring_boot"
+    },
+    {
+      "id": "conv_global_spring_boot_b8320ab1f724412c",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "**/*.java"
+      },
+      "rule_nl": "Use Spring Security; never custom auth filters.",
+      "category": "SecurityDefaults",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.824221Z",
+      "written_at": "2026-05-15T20:10:06.824221Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.824221Z",
+      "stack_tag": "spring_boot"
+    },
+    {
+      "id": "conv_global_spring_boot_ada564611dc84876",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "**/*.java"
+      },
+      "rule_nl": "Use JPA fetch-joins to avoid N+1.",
+      "category": "PerformanceDefaults",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.824221Z",
+      "written_at": "2026-05-15T20:10:06.824221Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.824221Z",
+      "stack_tag": "spring_boot"
+    },
+    {
+      "id": "conv_global_spring_boot_f923d8c6c61c4400",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "**/*.java"
+      },
+      "rule_nl": "Use `@Async` only with explicit `Executor`; no orphan thread starts.",
+      "category": "Concurrency",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.824221Z",
+      "written_at": "2026-05-15T20:10:06.824221Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.824221Z",
+      "stack_tag": "spring_boot"
+    },
+    {
+      "id": "conv_global_spring_boot_9cf943ce7de14296",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "**/*.java"
+      },
+      "rule_nl": "OpenAPI annotations on every controller method.",
+      "category": "ApiShape",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.824221Z",
+      "written_at": "2026-05-15T20:10:06.824221Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.824221Z",
+      "stack_tag": "spring_boot"
+    }
+  ]
+}

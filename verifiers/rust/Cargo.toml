@@ -1,0 +1,102 @@
+[package]
+name = "crucible-verify-rust"
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.78"
+description = "Crucible Phase-4 per-language verifier runner (Rust)."
+license = "Apache-2.0"
+publish = false
+authors = ["Crucible Team"]
+keywords = ["crucible", "verifier", "mutation", "proptest", "kani"]
+categories = ["development-tools::testing"]
+
+[lib]
+name = "crucible_verify_rust"
+path = "src/lib.rs"
+
+[[bin]]
+name = "crucible-verify-rust"
+path = "src/main.rs"
+
+# Pinned per the Phase-4 spec (May 2026 research).
+# - serde / serde_json: schema (de)serialisation
+# - anyhow: ergonomic error propagation
+# - clap: CLI parsing
+# - sha2: SHA-256 of Tier-4 rebuild artefacts
+# - hex: hex-encoding of digests
+# - tempfile: scratch dir for diff files and rebuild tmpdirs
+# - chrono: RFC3339 timestamps for started_at / finished_at
+# - regex: harness discovery (#[kani::proof], property test names)
+# - which: locating cargo/cargo-mutants/cargo-kani on PATH
+#
+# We deliberately do NOT depend on the Rust property/mutation tooling
+# itself — the runner shells out to those binaries so it can run in a
+# minimal sandbox image without the tooling tree compiled in.
+[dependencies]
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+anyhow = "1.0"
+clap = { version = "4.5", features = ["derive"] }
+sha2 = "0.10"
+hex = "0.4"
+tempfile = "3.10"
+chrono = { version = "0.4", default-features = false, features = ["serde", "clock"] }
+regex = "1.10"
+which = "6.0"
+
+[dev-dependencies]
+serde_json = "1.0"
+tempfile = "3.10"
+which = "6.0"
+
+[profile.release]
+lto = "thin"
+codegen-units = 1
+strip = true
+
+[lints.rust]
+unsafe_code = "forbid"
+unused_must_use = "deny"
+missing_docs = "warn"
+
+[lints.clippy]
+pedantic = { level = "warn", priority = -1 }
+# Module name repetitions are fine for the schema/tier layout.
+module_name_repetitions = "allow"
+# Long doc comments are intentional in the schema file.
+doc_markdown = "allow"
+# We accept some &str→String for clarity in CLI plumbing.
+needless_pass_by_value = "allow"
+# Acceptable for I/O-heavy code paths.
+missing_errors_doc = "allow"
+missing_panics_doc = "allow"
+must_use_candidate = "allow"
+# Encourage explicit JSON shape.
+implicit_hasher = "allow"
+# `as` casts in domain-bounded code (mutation counts, fuzz corpus
+# entries) are deliberate; precision loss is acceptable for telemetry.
+cast_possible_truncation = "allow"
+cast_precision_loss = "allow"
+cast_sign_loss = "allow"
+cast_lossless = "allow"
+# `use super::*;` in #[cfg(test)] blocks is the conventional pattern.
+wildcard_imports = "allow"
+# Constants ending in `_SECS` are clearer than `_SECONDS`.
+similar_names = "allow"
+# `to_string` in tests is fine.
+str_to_string = "allow"
+# We deliberately use `unwrap_or` over `unwrap_or_else` where the
+# default value is a cheap constant.
+unnecessary_wraps = "allow"
+# Long function bodies in the tier runners are by design — they
+# linearly walk the tool-shell-parse-summarise pipeline.
+too_many_lines = "allow"
+# False positives on `if let Some(x) = y else { … }` ergonomics.
+manual_let_else = "allow"
+# Returning a default-named struct field in `..Default::default()`
+# stride is intentional.
+default_trait_access = "allow"
+# Use of `unwrap()` in tests is fine.
+unwrap_used = "allow"
+# Doc-comment punctuation is enforced by the formatter.
+unreadable_literal = "allow"

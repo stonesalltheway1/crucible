@@ -1,0 +1,36 @@
+# Cachet OSS status-page deployment.
+# Public URL: https://status.crucible.dev
+#
+# Per-tenant scoping is via the Cachet metric-groups feature; the
+# components.yaml file is consumed by a small init container that
+# applies it on first install.
+
+image:
+  repository: cachethq/docker
+  tag: latest
+  pullPolicy: IfNotPresent
+
+env:
+  APP_KEY: ""             # set at install
+  DB_DRIVER: pgsql
+  DB_HOST: ""
+  DB_DATABASE: cachet
+  DB_USERNAME: cachet
+  DB_PASSWORD: ""
+  CACHE_DRIVER: redis
+  QUEUE_DRIVER: redis
+  SESSION_DRIVER: redis
+  REDIS_HOST: redis-cachet.observability.svc
+
+ingress:
+  enabled: true
+  className: nginx
+  hosts:
+    - host: status.crucible.dev
+      paths: [{ path: /, pathType: Prefix }]
+  tls:
+    - { hosts: [status.crucible.dev], secretName: status-tls }
+
+resources:
+  requests: { cpu: 200m, memory: 256Mi }
+  limits:   { cpu: 1000m, memory: 1Gi }

@@ -1,0 +1,49 @@
+{
+  "name": "@crucible/verifier-typescript",
+  "version": "2026.06.0-phase4",
+  "description": "Per-language verifier runner for TypeScript/JavaScript — Tier 0/1/2/3/4 dispatcher (Crucible Phase 4).",
+  "private": true,
+  "type": "module",
+  "bin": {
+    "crucible-verify-typescript": "./dist/cli.js"
+  },
+  "main": "./dist/cli.js",
+  "exports": {
+    ".": {
+      "import": "./dist/cli.js",
+      "types": "./dist/cli.d.ts"
+    },
+    "./schema": {
+      "import": "./dist/schema.js",
+      "types": "./dist/schema.d.ts"
+    }
+  },
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run --reporter=default",
+    "test:watch": "vitest"
+  },
+  "dependencies": {
+    "fast-check": "4.7.0"
+  },
+  "devDependencies": {
+    "@fast-check/vitest": "0.4.1",
+    "@stryker-mutator/core": "9.6.1",
+    "@stryker-mutator/vitest-runner": "9.6.1",
+    "@types/node": "22.10.0",
+    "typescript": "5.6.3",
+    "vitest": "2.1.5"
+  },
+  "optionalDependencies": {
+    "@jazzer.js/core": "2.1.0"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "license": "Apache-2.0"
+}

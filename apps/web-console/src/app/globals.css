@@ -1,0 +1,105 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Crucible design tokens — see tailwind.config.ts for the rationale. */
+
+@layer base {
+  :root {
+    --background: 36 12% 96%;     /* paper */
+    --foreground: 0 0% 8%;        /* ink */
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 8%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 8%;
+    --primary: 0 0% 8%;
+    --primary-foreground: 36 12% 96%;
+    --secondary: 36 8% 90%;
+    --secondary-foreground: 0 0% 8%;
+    --muted: 36 8% 92%;
+    --muted-foreground: 0 0% 38%;
+    --destructive: 2 65% 39%;
+    --destructive-foreground: 36 12% 98%;
+    --border: 36 6% 86%;
+    --input: 36 6% 86%;
+    --ring: 0 0% 8%;
+  }
+
+  .dark {
+    --background: 36 6% 7%;
+    --foreground: 36 8% 92%;
+    --card: 36 6% 9%;
+    --card-foreground: 36 8% 92%;
+    --popover: 36 6% 9%;
+    --popover-foreground: 36 8% 92%;
+    --primary: 36 8% 92%;
+    --primary-foreground: 36 6% 7%;
+    --secondary: 36 6% 14%;
+    --secondary-foreground: 36 8% 92%;
+    --muted: 36 6% 14%;
+    --muted-foreground: 36 6% 60%;
+    --destructive: 2 65% 50%;
+    --destructive-foreground: 36 8% 96%;
+    --border: 36 6% 18%;
+    --input: 36 6% 18%;
+    --ring: 36 8% 80%;
+  }
+
+  * {
+    @apply border-border;
+  }
+  html {
+    font-feature-settings: "ss01", "ss02", "cv11";
+  }
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-feature-settings: "rlig" 1, "calt" 1, "ss01", "cv11";
+  }
+  code, pre, kbd, samp, .tabular {
+    @apply font-mono;
+    font-variant-ligatures: none;
+  }
+}
+
+@layer components {
+  /* Anti-vibe button base — sharp edges, no gradients, no glow. */
+  .btn-ink {
+    @apply inline-flex items-center justify-center gap-2 border border-ink-800
+           bg-ink-900 px-3 py-1.5 text-sm font-medium text-ink-50
+           transition-colors hover:bg-ink-800 focus-visible:outline-none
+           focus-visible:ring-2 focus-visible:ring-ink-900 focus-visible:ring-offset-2
+           disabled:opacity-50 disabled:pointer-events-none;
+  }
+  .btn-paper {
+    @apply inline-flex items-center justify-center gap-2 border border-ink-300
+           bg-ink-50 px-3 py-1.5 text-sm font-medium text-ink-900
+           transition-colors hover:bg-ink-100 focus-visible:outline-none
+           focus-visible:ring-2 focus-visible:ring-ink-900 focus-visible:ring-offset-2
+           disabled:opacity-50 disabled:pointer-events-none;
+  }
+  .btn-danger {
+    @apply inline-flex items-center justify-center gap-2 border border-accent-alert
+           bg-transparent px-3 py-1.5 text-sm font-medium text-accent-alert
+           hover:bg-accent-alert hover:text-ink-50 disabled:opacity-50;
+  }
+  .pill {
+    @apply inline-flex items-center gap-1 border px-1.5 py-0.5 text-xs font-medium
+           tabular-nums;
+  }
+  .pill-ok { @apply border-accent-ok/40 bg-accent-ok/8 text-accent-ok; }
+  .pill-warn { @apply border-accent-warn/40 bg-accent-warn/10 text-accent-warn; }
+  .pill-alert { @apply border-accent-alert/40 bg-accent-alert/10 text-accent-alert; }
+  .pill-info { @apply border-accent-info/40 bg-accent-info/10 text-accent-info; }
+  .pill-mute { @apply border-ink-300 bg-ink-100 text-ink-700; }
+
+  /* Hash / UUID / signature surfaces — always mono, never wrap. */
+  .hash {
+    @apply font-mono text-xs tracking-tight text-ink-700;
+    word-break: keep-all;
+  }
+  .hash-block {
+    @apply rounded-none border border-ink-200 bg-ink-50 p-2 font-mono text-xs
+           leading-relaxed text-ink-800;
+    overflow-wrap: anywhere;
+  }
+}

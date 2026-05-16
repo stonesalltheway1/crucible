@@ -1,0 +1,119 @@
+name: test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  go-test:
+    name: go test (${{ matrix.module }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        module:
+          - apps/control-plane
+          - apps/cli
+          - libs/sdk-go
+          - libs/attestation
+          - libs/policy
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.23'
+          cache-dependency-path: ${{ matrix.module }}/go.sum
+      - name: go test (short)
+        run: |
+          cd ${{ matrix.module }}
+          go test -short -race -coverprofile=coverage.out ./...
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: coverage-${{ strategy.job-index }}
+          path: ${{ matrix.module }}/coverage.out
+
+  ts-test:
+    name: node --test (sdk-ts)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: corepack enable
+      - run: cd libs/sdk-ts && pnpm install --frozen-lockfile || pnpm install
+      - run: cd libs/sdk-ts && npx tsc -p tsconfig.json
+      - run: cd libs/sdk-ts && node --test --experimental-strip-types src/
+
+  py-test:
+    name: pytest (sdk-py)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install -e 'libs/sdk-py[dev]'
+      - run: cd libs/sdk-py && pytest -q
+
+  rust-test:
+    name: cargo test (sdk-rs)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: libs/sdk-rs
+      - run: cd libs/sdk-rs && cargo test --all-targets
+
+  mutation-go:
+    name: go mutation testing on diff
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-go@v5
+        with:
+          go-version: '1.23'
+      - name: install go-mutesting
+        run: go install github.com/zimmski/go-mutesting/cmd/go-mutesting@latest
+      - name: mutation testing on changed Go packages
+        # Find packages with .go files changed in the PR and run mutation
+        # testing against them only. Threshold ≥ 75% per testing-strategy.md
+        # (Go's mutation tooling is weaker than mutmut/stryker/cargo-mutants).
+        run: |
+          changed=$(git diff --name-only origin/${{ github.base_ref }}...HEAD -- '*.go' \
+                    | xargs -r -n1 dirname | sort -u || true)
+          echo "Changed Go dirs: $changed"
+          if [ -z "$changed" ]; then
+            echo "No Go diff; skipping mutation testing."
+            exit 0
+          fi
+          # Phase 1: report-only (do not fail PR) until baseline established.
+          for d in $changed; do
+            echo "::group::go-mutesting $d"
+            go-mutesting --quiet $d/... || true
+            echo "::endgroup::"
+          done
+
+  mutation-rust:
+    name: cargo-mutants on diff
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: dtolnay/rust-toolchain@stable
+      - run: cargo install --locked cargo-mutants
+      # Phase 1: report-only on Rust SDK (small surface).
+      - run: cd libs/sdk-rs && cargo mutants --in-diff --check || true

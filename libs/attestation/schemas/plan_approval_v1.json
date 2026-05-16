@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://crucible.dev/PlanApproval/v1",
+  "title": "PlanApproval",
+  "type": "object",
+  "required": ["task_id", "plan_hash", "approved_by_oidc", "approved_at"],
+  "properties": {
+    "task_id":             { "type": "string" },
+    "plan_hash":           { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "estimated_cost_usd":  { "type": "number", "minimum": 0 },
+    "approved_by_oidc":    { "type": "string", "format": "uri" },
+    "approved_at":         { "type": "string", "format": "date-time" }
+  },
+  "additionalProperties": false
+}

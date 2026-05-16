@@ -1,0 +1,32 @@
+{{- if .Values.crucible.shadowRecorder.enabled }}
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: crucible-shadow-recorder
+  namespace: {{ .Release.Namespace }}
+spec:
+  replicas: {{ .Values.replicas }}
+  selector: { matchLabels: { app.kubernetes.io/component: shadow-recorder } }
+  template:
+    metadata: { labels: { app.kubernetes.io/component: shadow-recorder } }
+    spec:
+      containers:
+        - name: shadow-recorder
+          image: "{{ .Values.global.imageRegistry }}/{{ .Values.image.name }}:{{ .Values.global.imageTag }}"
+          ports: [{ name: http, containerPort: {{ .Values.service.port }} }]
+          env:
+            - { name: CRUCIBLE_SHADOW_LISTEN, value: ":{{ .Values.service.port }}" }
+            - { name: CRUCIBLE_SCRUBBER_URL,  value: "{{ .Values.crucible.tapeScrubber.url }}" }
+            - { name: CRUCIBLE_SHADOW_OBJECTSTORE, value: "{{ .Values.crucible.shadowRecorder.tapeBucket }}" }
+            - { name: CRUCIBLE_SHADOW_FAIL_CLOSED, value: "1" }
+          resources: {{ toYaml .Values.resources | nindent 12 }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: crucible-shadow-recorder
+  namespace: {{ .Release.Namespace }}
+spec:
+  selector: { app.kubernetes.io/component: shadow-recorder }
+  ports: [{ port: {{ .Values.service.port }}, targetPort: http, name: http }]
+{{- end }}

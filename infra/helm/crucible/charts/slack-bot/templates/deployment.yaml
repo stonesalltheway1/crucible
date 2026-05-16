@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: crucible-slack-bot
+  namespace: {{ .Release.Namespace }}
+spec:
+  replicas: {{ .Values.replicas }}
+  selector: { matchLabels: { app.kubernetes.io/component: slack-bot } }
+  template:
+    metadata: { labels: { app.kubernetes.io/component: slack-bot } }
+    spec:
+      containers:
+        - name: slack-bot
+          image: "{{ .Values.global.imageRegistry }}/{{ .Values.image.name }}:{{ .Values.global.imageTag }}"
+          ports: [{ name: http, containerPort: {{ .Values.service.port }} }]
+          env:
+            - { name: CRUCIBLE_PROMOTION_GATE_ADDR, value: "http://crucible-promotion-gate.{{ .Release.Namespace }}.svc:9180" }
+            - { name: CRUCIBLE_RELAY_ADDR, value: "http://crucible-attestation-relay.{{ .Release.Namespace }}.svc:9120" }
+            - name: CRUCIBLE_SLACK_BOT_TOKEN
+              valueFrom: { secretKeyRef: { name: crucible-slack-bot, key: bot_token } }
+            - name: CRUCIBLE_SLACK_SIGNING_SECRET
+              valueFrom: { secretKeyRef: { name: crucible-slack-bot, key: signing_secret } }
+          resources: {{ toYaml .Values.resources | nindent 12 }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: crucible-slack-bot
+  namespace: {{ .Release.Namespace }}
+spec:
+  selector: { app.kubernetes.io/component: slack-bot }
+  ports: [{ port: {{ .Values.service.port }}, targetPort: http, name: http }]

@@ -1,0 +1,234 @@
+{
+  "bundle_version": "1",
+  "stack": "rust_services",
+  "generated_at": "2026-05-15T20:10:06.829156Z",
+  "generator_commit": "",
+  "license": {
+    "safe_for_redistribution": true,
+    "input_licenses_seen": [
+      "Apache-2.0",
+      "MIT"
+    ],
+    "excluded_licenses": [],
+    "attribution_file": "THIRD_PARTY_SOURCES.md"
+  },
+  "stats": {
+    "repos_examined": 200,
+    "configs_parsed": 120,
+    "agents_md_parsed": 80,
+    "pr_comments_mined": 0,
+    "adrs_parsed": 0,
+    "raw_candidates": 36,
+    "post_judge": 12,
+    "post_agreement": 12,
+    "active_rules": 12,
+    "suggested_rules": 0,
+    "candidate_rules": 0
+  },
+  "conventions": [
+    {
+      "id": "conv_global_rust_services_a3f88173555f4059",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "**/*.rs"
+      },
+      "rule_nl": "Module names snake_case; types CamelCase.",
+      "category": "Naming",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.829156Z",
+      "written_at": "2026-05-15T20:10:06.829156Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.829156Z",
+      "stack_tag": "rust_services"
+    },
+    {
+      "id": "conv_global_rust_services_ab85a8ebd7c84967",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "**/*.rs"
+      },
+      "rule_nl": "Application crate cannot import from binary crates.",
+      "category": "Layering",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.829156Z",
+      "written_at": "2026-05-15T20:10:06.829156Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.829156Z",
+      "stack_tag": "rust_services"
+    },
+    {
+      "id": "conv_global_rust_services_fb82fb8ae0074c81",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "**/*.rs"
+      },
+      "rule_nl": "Use `tracing` for logs; never `println!` in service code.",
+      "category": "LibraryPreferences",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.829156Z",
+      "written_at": "2026-05-15T20:10:06.829156Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.829156Z",
+      "stack_tag": "rust_services"
+    },
+    {
+      "id": "conv_global_rust_services_ed9bbc01c2944db2",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "**/*.rs"
+      },
+      "rule_nl": "Unit tests in `#[cfg(test)] mod tests`; integration tests in `tests/`.",
+      "category": "TestPatterns",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.829156Z",
+      "written_at": "2026-05-15T20:10:06.829156Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.829156Z",
+      "stack_tag": "rust_services"
+    },
+    {
+      "id": "conv_global_rust_services_96cbfd682d804b3a",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "**/*.rs"
+      },
+      "rule_nl": "Use `thiserror` for libraries; `anyhow` for binaries.",
+      "category": "ErrorHandling",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.829156Z",
+      "written_at": "2026-05-15T20:10:06.829156Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.829156Z",
+      "stack_tag": "rust_services"
+    },
+    {
+      "id": "conv_global_rust_services_8e0583ed61f84390",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "**/*.rs"
+      },
+      "rule_nl": "`tracing::info!`/`warn!`/`error!` with structured fields.",
+      "category": "Logging",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.829156Z",
+      "written_at": "2026-05-15T20:10:06.829156Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.829156Z",
+      "stack_tag": "rust_services"
+    },
+    {
+      "id": "conv_global_rust_services_905ee563bd7d481f",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "migrations/**/*.sql"
+      },
+      "rule_nl": "Use `sqlx::migrate!`; never edit applied migrations.",
+      "category": "MigrationPatterns",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.829156Z",
+      "written_at": "2026-05-15T20:10:06.829156Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.829156Z",
+      "stack_tag": "rust_services"
+    },
+    {
+      "id": "conv_global_rust_services_99fe83a416394c7d",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "*"
+      },
+      "rule_nl": "Conventional Commits + rustfmt + clippy.",
+      "category": "PrCommitHygiene",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.829156Z",
+      "written_at": "2026-05-15T20:10:06.829156Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.829156Z",
+      "stack_tag": "rust_services"
+    },
+    {
+      "id": "conv_global_rust_services_2ce3daf390684d73",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "**/*.rs"
+      },
+      "rule_nl": "Don't `unsafe` outside FFI boundary modules.",
+      "category": "SecurityDefaults",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.829156Z",
+      "written_at": "2026-05-15T20:10:06.829156Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.829156Z",
+      "stack_tag": "rust_services"
+    },
+    {
+      "id": "conv_global_rust_services_6db33be54b8042e1",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "**/*.rs"
+      },
+      "rule_nl": "Avoid `clone()` in hot loops; prefer borrowed forms.",
+      "category": "PerformanceDefaults",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.829156Z",
+      "written_at": "2026-05-15T20:10:06.829156Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.829156Z",
+      "stack_tag": "rust_services"
+    },
+    {
+      "id": "conv_global_rust_services_e65e13c92b6b4234",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "**/*.rs"
+      },
+      "rule_nl": "Pass `tokio::CancellationToken` through async chains.",
+      "category": "Concurrency",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.829156Z",
+      "written_at": "2026-05-15T20:10:06.829156Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.829156Z",
+      "stack_tag": "rust_services"
+    },
+    {
+      "id": "conv_global_rust_services_b7ec3cf6c4a244c6",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "src/api/**/*.rs"
+      },
+      "rule_nl": "axum handlers return `Result<Json<T>, ApiError>` envelopes.",
+      "category": "ApiShape",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.829156Z",
+      "written_at": "2026-05-15T20:10:06.829156Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.829156Z",
+      "stack_tag": "rust_services"
+    }
+  ]
+}

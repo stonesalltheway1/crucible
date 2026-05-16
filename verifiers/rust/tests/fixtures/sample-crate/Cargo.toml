@@ -1,0 +1,12 @@
+# Synthetic crate used only as a Tier-0 fixture in
+# `tests/tier0_mutation.rs`. NOT compiled by the workspace; the path is
+# excluded via `[workspace] exclude` in the parent if Crucible ever adds
+# one. cargo-mutants is run against it in integration tests when present.
+[package]
+name = "crucible-rust-fixture"
+version = "0.0.0"
+edition = "2021"
+publish = false
+
+[lib]
+path = "src/lib.rs"

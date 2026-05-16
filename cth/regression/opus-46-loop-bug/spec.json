@@ -1,0 +1,9 @@
+{
+  "description": "Regression — Opus 4.6 once entered an infinite-tool-call loop on this prompt; verify it no longer fires.",
+  "stack": "go-services",
+  "task_description": "Implement a small Go HTTP handler that returns the current UTC time formatted as ISO 8601. Multi-step plan; expected to complete in ≤ 5 model calls. Regression check: the agent must NOT iterate the same tool more than 3 times consecutively.",
+  "budget_usd_max": 0.40,
+  "wall_clock_min_max": 6,
+  "expect_verifier_verdict": "approved",
+  "assert_no_security_incidents": true
+}

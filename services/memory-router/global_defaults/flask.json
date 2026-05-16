@@ -1,0 +1,235 @@
+{
+  "bundle_version": "1",
+  "stack": "flask",
+  "generated_at": "2026-05-15T20:10:06.819104Z",
+  "generator_commit": "",
+  "license": {
+    "safe_for_redistribution": true,
+    "input_licenses_seen": [
+      "Apache-2.0",
+      "MIT",
+      "Public Domain"
+    ],
+    "excluded_licenses": [],
+    "attribution_file": "THIRD_PARTY_SOURCES.md"
+  },
+  "stats": {
+    "repos_examined": 200,
+    "configs_parsed": 120,
+    "agents_md_parsed": 80,
+    "pr_comments_mined": 0,
+    "adrs_parsed": 0,
+    "raw_candidates": 36,
+    "post_judge": 12,
+    "post_agreement": 12,
+    "active_rules": 12,
+    "suggested_rules": 0,
+    "candidate_rules": 0
+  },
+  "conventions": [
+    {
+      "id": "conv_global_flask_c4a41b2e03b84a32",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "**/*.py"
+      },
+      "rule_nl": "Blueprint names match the URL prefix.",
+      "category": "Naming",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.819104Z",
+      "written_at": "2026-05-15T20:10:06.819104Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.819104Z",
+      "stack_tag": "flask"
+    },
+    {
+      "id": "conv_global_flask_631ac27cbaa34669",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "app/blueprints/**/*.py"
+      },
+      "rule_nl": "Blueprints don't import from each other.",
+      "category": "Layering",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.819104Z",
+      "written_at": "2026-05-15T20:10:06.819104Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.819104Z",
+      "stack_tag": "flask"
+    },
+    {
+      "id": "conv_global_flask_49e107cc098b4469",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "**/*.py"
+      },
+      "rule_nl": "Use `Flask-SQLAlchemy`; avoid raw SQL outside repos.",
+      "category": "LibraryPreferences",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.819104Z",
+      "written_at": "2026-05-15T20:10:06.819104Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.819104Z",
+      "stack_tag": "flask"
+    },
+    {
+      "id": "conv_global_flask_d20b0f27ff284425",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "tests/**/*.py"
+      },
+      "rule_nl": "Use `pytest` fixtures for app factory + db.",
+      "category": "TestPatterns",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.819104Z",
+      "written_at": "2026-05-15T20:10:06.819104Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.819104Z",
+      "stack_tag": "flask"
+    },
+    {
+      "id": "conv_global_flask_1c509f6efcef42ef",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "**/*.py"
+      },
+      "rule_nl": "Use `errorhandler` per blueprint with structured envelopes.",
+      "category": "ErrorHandling",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.819104Z",
+      "written_at": "2026-05-15T20:10:06.819104Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.819104Z",
+      "stack_tag": "flask"
+    },
+    {
+      "id": "conv_global_flask_343bdf1aaf794694",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "app/__init__.py"
+      },
+      "rule_nl": "Configure `dictConfig` once at startup; no print().",
+      "category": "Logging",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.819104Z",
+      "written_at": "2026-05-15T20:10:06.819104Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.819104Z",
+      "stack_tag": "flask"
+    },
+    {
+      "id": "conv_global_flask_7a688e40915b4f08",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "migrations/**/*.py"
+      },
+      "rule_nl": "Alembic migrations are additive-only.",
+      "category": "MigrationPatterns",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.819104Z",
+      "written_at": "2026-05-15T20:10:06.819104Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.819104Z",
+      "stack_tag": "flask"
+    },
+    {
+      "id": "conv_global_flask_8b777b02527f4eb1",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "*"
+      },
+      "rule_nl": "Conventional Commits.",
+      "category": "PrCommitHygiene",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.819104Z",
+      "written_at": "2026-05-15T20:10:06.819104Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.819104Z",
+      "stack_tag": "flask"
+    },
+    {
+      "id": "conv_global_flask_8f62b9334b7a48f3",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "app/blueprints/**/*.py"
+      },
+      "rule_nl": "Auth via `before_request` blueprint hook.",
+      "category": "SecurityDefaults",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.819104Z",
+      "written_at": "2026-05-15T20:10:06.819104Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.819104Z",
+      "stack_tag": "flask"
+    },
+    {
+      "id": "conv_global_flask_d8ce3c3ccb794529",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "**/*.py"
+      },
+      "rule_nl": "Bulk queries via `db.session.scalars().all()`.",
+      "category": "PerformanceDefaults",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.819104Z",
+      "written_at": "2026-05-15T20:10:06.819104Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.819104Z",
+      "stack_tag": "flask"
+    },
+    {
+      "id": "conv_global_flask_4bcc25f0eb1a4e14",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "**/*.py"
+      },
+      "rule_nl": "Don't mix sync and async views without `asgiref`.",
+      "category": "Concurrency",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.819104Z",
+      "written_at": "2026-05-15T20:10:06.819104Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.819104Z",
+      "stack_tag": "flask"
+    },
+    {
+      "id": "conv_global_flask_344314d2e68b4612",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "**/*.py"
+      },
+      "rule_nl": "JSON envelope: `{ data | error }`.",
+      "category": "ApiShape",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.819104Z",
+      "written_at": "2026-05-15T20:10:06.819104Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.819104Z",
+      "stack_tag": "flask"
+    }
+  ]
+}

@@ -1,0 +1,35 @@
+                                 Apache License
+                           Version 2.0, January 2004
+                        http://www.apache.org/licenses/
+
+   Licensed under the Apache License, Version 2.0 (the "License");
+   you may not use this file except in compliance with the License.
+   You may obtain a copy of the License at
+
+       http://www.apache.org/licenses/LICENSE-2.0
+
+   Unless required by applicable law or agreed to in writing, software
+   distributed under the License is distributed on an "AS IS" BASIS,
+   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+   See the License for the specific language governing permissions and
+   limitations under the License.
+
+Copyright 2026 The Crucible Authors
+
+NOTE: This repository contains both Apache-2.0-licensed open-source components
+and proprietary commercial components. Each top-level directory carries its own
+LICENSE file when it differs from this root license. The Apache-2.0 license
+above applies to:
+
+  - libs/sdk-go, libs/sdk-ts, libs/sdk-py, libs/sdk-rs
+  - libs/twin-spec, libs/memory-spec, libs/tape-format
+  - libs/attestation
+  - libs/policy
+  - verifiers/* (the OSS verifier harness)
+  - apps/cli (the OSS CLI)
+  - examples/*
+  - docs/*
+
+The Crucible Control Plane, Twin Runtime, Verifier daemon, Promotion Gate,
+and Distiller are released under a separate commercial license. See the
+LICENSE file in each application directory for terms.

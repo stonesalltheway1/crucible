@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://crucible.dev/PromotionOutcome/v1",
+  "title": "PromotionOutcome",
+  "type": "object",
+  "required": ["promotion_id", "bundle_attestation", "outcome", "completed_at"],
+  "properties": {
+    "promotion_id":        { "type": "string" },
+    "bundle_attestation":  { "type": "string" },
+    "outcome":             { "type": "string", "enum": ["landed", "rolled_back", "approval_timeout", "policy_denied"] },
+    "rollout_steps": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["weight", "dwell_seconds"],
+        "properties": {
+          "weight":         { "type": "integer", "minimum": 0, "maximum": 100 },
+          "dwell_seconds":  { "type": "integer", "minimum": 0 },
+          "slo_check":      { "type": "string" },
+          "timestamp":      { "type": "string", "format": "date-time" }
+        }
+      }
+    },
+    "final_state":         { "type": "string" },
+    "rollback_reason":     { "type": ["string", "null"] },
+    "completed_at":        { "type": "string", "format": "date-time" }
+  },
+  "additionalProperties": false
+}

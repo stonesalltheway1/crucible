@@ -1,0 +1,9 @@
+{
+  "description": "Greenfield Rust CLI with clap, anyhow, snapshot tests via insta.",
+  "stack": "rust-services",
+  "task_description": "Build a Rust 2024 edition CLI that ingests a CSV and emits aggregate stats. Use clap, anyhow, csv, serde. Include insta snapshot tests + cargo-mutants on the diff. `cargo test --all-targets` clean; `cargo clippy -- -D warnings` clean.",
+  "budget_usd_max": 3.00,
+  "wall_clock_min_max": 18,
+  "expect_verifier_verdict": "approved",
+  "assert_no_security_incidents": true
+}

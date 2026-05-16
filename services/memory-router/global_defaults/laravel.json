@@ -1,0 +1,233 @@
+{
+  "bundle_version": "1",
+  "stack": "laravel",
+  "generated_at": "2026-05-15T20:10:06.840149Z",
+  "generator_commit": "",
+  "license": {
+    "safe_for_redistribution": true,
+    "input_licenses_seen": [
+      "Apache-2.0"
+    ],
+    "excluded_licenses": [],
+    "attribution_file": "THIRD_PARTY_SOURCES.md"
+  },
+  "stats": {
+    "repos_examined": 200,
+    "configs_parsed": 120,
+    "agents_md_parsed": 80,
+    "pr_comments_mined": 0,
+    "adrs_parsed": 0,
+    "raw_candidates": 36,
+    "post_judge": 12,
+    "post_agreement": 12,
+    "active_rules": 12,
+    "suggested_rules": 0,
+    "candidate_rules": 0
+  },
+  "conventions": [
+    {
+      "id": "conv_global_laravel_88e6d5c30b0f4e50",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "app/Http/Controllers/**/*.php"
+      },
+      "rule_nl": "Controllers single-action with `__invoke`.",
+      "category": "Naming",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.840149Z",
+      "written_at": "2026-05-15T20:10:06.840149Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.840149Z",
+      "stack_tag": "laravel"
+    },
+    {
+      "id": "conv_global_laravel_7f737393e7d944b2",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "app/**/*.php"
+      },
+      "rule_nl": "Services under `app/Services/`; controllers stay thin.",
+      "category": "Layering",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.840149Z",
+      "written_at": "2026-05-15T20:10:06.840149Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.840149Z",
+      "stack_tag": "laravel"
+    },
+    {
+      "id": "conv_global_laravel_fc1c421fa1da4af5",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "app/**/*.php"
+      },
+      "rule_nl": "Use Eloquent over query builder for typed scopes.",
+      "category": "LibraryPreferences",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.840149Z",
+      "written_at": "2026-05-15T20:10:06.840149Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.840149Z",
+      "stack_tag": "laravel"
+    },
+    {
+      "id": "conv_global_laravel_78eae55a0c8e4a68",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "tests/**/*.php"
+      },
+      "rule_nl": "Use Pest; feature tests under `tests/Feature/`.",
+      "category": "TestPatterns",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.840149Z",
+      "written_at": "2026-05-15T20:10:06.840149Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.840149Z",
+      "stack_tag": "laravel"
+    },
+    {
+      "id": "conv_global_laravel_9fe65cb8d1bd4187",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "app/**/*.php"
+      },
+      "rule_nl": "Throw domain exceptions; `Handler::render` envelopes.",
+      "category": "ErrorHandling",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.840149Z",
+      "written_at": "2026-05-15T20:10:06.840149Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.840149Z",
+      "stack_tag": "laravel"
+    },
+    {
+      "id": "conv_global_laravel_82014b2d2b2040be",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "app/**/*.php"
+      },
+      "rule_nl": "Use `Log::info` with context arrays.",
+      "category": "Logging",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.840149Z",
+      "written_at": "2026-05-15T20:10:06.840149Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.840149Z",
+      "stack_tag": "laravel"
+    },
+    {
+      "id": "conv_global_laravel_b6c4ace61b19405a",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "database/migrations/**/*.php"
+      },
+      "rule_nl": "Migrations additive-only; no down-only ops.",
+      "category": "MigrationPatterns",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.840149Z",
+      "written_at": "2026-05-15T20:10:06.840149Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.840149Z",
+      "stack_tag": "laravel"
+    },
+    {
+      "id": "conv_global_laravel_b8389ce158f2450d",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "*"
+      },
+      "rule_nl": "Conventional Commits.",
+      "category": "PrCommitHygiene",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.840149Z",
+      "written_at": "2026-05-15T20:10:06.840149Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.840149Z",
+      "stack_tag": "laravel"
+    },
+    {
+      "id": "conv_global_laravel_f2abb760bd0a45d9",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "routes/**/*.php"
+      },
+      "rule_nl": "Auth middleware on every route group.",
+      "category": "SecurityDefaults",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.840149Z",
+      "written_at": "2026-05-15T20:10:06.840149Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.840149Z",
+      "stack_tag": "laravel"
+    },
+    {
+      "id": "conv_global_laravel_7815a3bd1aaf492e",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "app/**/*.php"
+      },
+      "rule_nl": "Eager load with `with()`.",
+      "category": "PerformanceDefaults",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.840149Z",
+      "written_at": "2026-05-15T20:10:06.840149Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.840149Z",
+      "stack_tag": "laravel"
+    },
+    {
+      "id": "conv_global_laravel_dcbdba5d826a453c",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "app/Jobs/**/*.php"
+      },
+      "rule_nl": "Queue jobs via Horizon; no inline `dispatch_sync` in hot paths.",
+      "category": "Concurrency",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.840149Z",
+      "written_at": "2026-05-15T20:10:06.840149Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.840149Z",
+      "stack_tag": "laravel"
+    },
+    {
+      "id": "conv_global_laravel_e0345045625f4fa7",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "app/Http/Controllers/Api/**/*.php"
+      },
+      "rule_nl": "JSON:API or `{ data, errors }` envelope.",
+      "category": "ApiShape",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.840149Z",
+      "written_at": "2026-05-15T20:10:06.840149Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.840149Z",
+      "stack_tag": "laravel"
+    }
+  ]
+}

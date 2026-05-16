@@ -1,0 +1,28 @@
+{{- if .Values.crucible.networkPolicy.enabled }}
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: crucible-default-deny
+  namespace: {{ .Release.Namespace }}
+spec:
+  podSelector: {}
+  policyTypes: [Ingress, Egress]
+  egress:
+    # Allow DNS in-cluster.
+    - to:
+        - namespaceSelector: {}
+      ports:
+        - port: 53
+          protocol: UDP
+        - port: 53
+          protocol: TCP
+    # Allow vendor LLM APIs from the allowlist.
+    {{- range .Values.crucible.networkPolicy.egressAllowlist }}
+    - to:
+        - ipBlock:
+            cidr: 0.0.0.0/0
+      ports:
+        - port: 443
+          protocol: TCP
+    {{- end }}
+{{- end }}

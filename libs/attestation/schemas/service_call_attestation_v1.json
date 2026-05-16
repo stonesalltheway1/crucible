@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://crucible.dev/ServiceCallAttestation/v1",
+  "title": "ServiceCallAttestation",
+  "type": "object",
+  "required": ["task_id", "tenant_id", "service", "endpoint", "method", "request_hash", "response_hash", "tape_disposition", "duration_ms", "agent_oidc_subject"],
+  "properties": {
+    "task_id":             { "type": "string" },
+    "tenant_id":           { "type": "string" },
+    "service":             { "type": "string" },
+    "endpoint":            { "type": "string" },
+    "method":              { "type": "string", "enum": ["GET", "HEAD", "POST", "PUT", "PATCH", "DELETE", "OPTIONS", "CONNECT", "TRACE"] },
+    "request_hash":        { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "response_hash":       { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "tape_disposition":    { "type": "string", "enum": ["hit-exact", "hit-template", "synth-readonly", "synth-mutation", "live-passthrough", "miss-blocked"] },
+    "x_crucible_tape":     { "type": "string" },
+    "duration_ms":         { "type": "integer", "minimum": 0 },
+    "secrets_used":        { "type": "array", "items": { "type": "string" } },
+    "agent_oidc_subject":  { "type": "string", "format": "uri" }
+  },
+  "additionalProperties": false
+}

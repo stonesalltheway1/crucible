@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: crucible-cost-meter
+  namespace: {{ .Release.Namespace }}
+spec:
+  replicas: {{ .Values.replicas }}
+  selector: { matchLabels: { app.kubernetes.io/component: cost-meter } }
+  template:
+    metadata: { labels: { app.kubernetes.io/component: cost-meter } }
+    spec:
+      containers:
+        - name: cost-meter
+          image: "{{ .Values.global.imageRegistry }}/{{ .Values.image.name }}:{{ .Values.global.imageTag }}"
+          ports: [{ name: http, containerPort: {{ .Values.service.port }} }]
+          env:
+            - { name: CRUCIBLE_COST_LISTEN, value: ":{{ .Values.service.port }}" }
+          resources: {{ toYaml .Values.resources | nindent 12 }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: crucible-cost-meter
+  namespace: {{ .Release.Namespace }}
+spec:
+  selector: { app.kubernetes.io/component: cost-meter }
+  ports: [{ port: {{ .Values.service.port }}, targetPort: http, name: http }]

@@ -1,0 +1,62 @@
+# Build outputs
+/result
+/result-*
+/dist
+/build
+**/target
+**/node_modules
+**/.next
+**/.turbo
+**/__pycache__
+*.pyc
+
+# Go
+**/vendor
+*.test
+*.out
+coverage.out
+coverage.html
+
+# Rust
+Cargo.lock.bak
+**/*.rs.bk
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Environment / secrets — never commit
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+!**/testdata/**/*.pem
+!**/testdata/**/*.key
+
+# Logs
+*.log
+logs/
+
+# Attestation journals (local fallback only)
+.crucible/attestations/
+.crucible/journal/
+
+# Generated protobuf — generated locally and in CI; not committed
+# (see scripts/regen-proto.sh)
+libs/sdk-go/gen/
+libs/sdk-ts/src/gen/
+libs/sdk-py/crucible_sdk/gen/
+libs/sdk-rs/src/gen/
+
+# Nix / direnv
+.direnv/
+.envrc.local
+
+# OS
+*~
+.#*

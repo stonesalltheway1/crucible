@@ -1,0 +1,10 @@
+{
+  "description": "Implement a refund engine — Tier 3 must validate idempotency + double-refund safety.",
+  "stack": "go-services",
+  "task_description": "Build a refund engine for an existing payment system. Idempotency keys mandatory. The refund handler is @critical. Tier 3 Dafny proof: no charge can be refunded twice; no refund issued without a corresponding successful charge.",
+  "budget_usd_max": 6.00,
+  "wall_clock_min_max": 45,
+  "expect_verifier_verdict": "approved",
+  "expect_tier3_triggered": true,
+  "assert_no_security_incidents": true
+}

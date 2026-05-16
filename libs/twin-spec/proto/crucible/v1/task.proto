@@ -1,0 +1,119 @@
+syntax = "proto3";
+
+package crucible.v1;
+
+import "google/protobuf/timestamp.proto";
+import "crucible/v1/common.proto";
+
+option go_package = "github.com/crucible/sdk-go/gen/crucible/v1;cruciblev1";
+
+// Task is a unit of work the agent has been asked to do.
+message Task {
+  string id = 1;                       // task_<ulid>
+  string tenant_id = 2;
+  string repo = 3;                     // e.g. github.com/acme/payments
+  string base_sha = 4;
+  string description = 5;
+  TaskStatus status = 6;
+  google.protobuf.Timestamp created_at = 7;
+  google.protobuf.Timestamp updated_at = 8;
+  string submitted_by = 9;             // OIDC subject
+  Plan plan = 10;
+  Routing routing = 11;
+  Budget budget = 12;
+  repeated string related_task_ids = 13;
+}
+
+enum TaskStatus {
+  TASK_STATUS_UNSPECIFIED = 0;
+  TASK_STATUS_RECEIVED = 1;            // task submitted, awaiting routing
+  TASK_STATUS_PLANNING = 2;            // plan being built
+  TASK_STATUS_AWAITING_APPROVAL = 3;   // plan presented to user
+  TASK_STATUS_APPROVED = 4;            // user approved; ready to execute
+  TASK_STATUS_REJECTED = 5;            // user rejected the plan
+  TASK_STATUS_EXECUTING = 6;
+  TASK_STATUS_VERIFYING = 7;
+  TASK_STATUS_PROMOTING = 8;
+  TASK_STATUS_LANDED = 9;
+  TASK_STATUS_ROLLED_BACK = 10;
+  TASK_STATUS_BUDGET_EXCEEDED = 11;
+  TASK_STATUS_RETRY_LIMIT_EXCEEDED = 12;
+  TASK_STATUS_WALL_CLOCK_EXCEEDED = 13;
+  TASK_STATUS_FAILED = 14;
+}
+
+// PlanStep is one step in the agent's planned approach.
+message PlanStep {
+  uint32 ordinal = 1;
+  string description = 2;
+  uint32 retry_budget = 3;             // per-step; default 3 per ADR-009
+  uint32 retries_used = 4;
+}
+
+// Plan is the contract presented to the user before execution.
+// Mirrors docs/03-sdk/agent-sdk-reference.md "Plan".
+message Plan {
+  string task_id = 1;
+  string description = 2;
+  repeated PlanStep steps = 3;
+  double estimated_cost_usd = 4;
+  uint32 estimated_duration_min = 5;
+  repeated string files_to_touch = 6;
+  uint32 db_migrations = 7;
+  repeated ExternalEffect external_effects = 8;
+  repeated Risk top_risks = 9;
+  uint32 retry_budget_per_step = 10;   // default 3 (ADR-009)
+  uint32 wall_clock_budget_min = 11;
+  Complexity complexity = 12;
+  string plan_hash = 13;               // sha256 of the canonical plan bytes
+  google.protobuf.Timestamp built_at = 14;
+}
+
+// PlanApproval is the signed acceptance of a Plan.
+message PlanApproval {
+  string task_id = 1;
+  string plan_hash = 2;
+  string approver_oidc_subject = 3;
+  google.protobuf.Timestamp approved_at = 4;
+  string attestation_id = 5;           // rekor UUID or local journal ID
+  // Caps may be set higher than the plan's defaults at approval time.
+  double cost_cap_usd = 6;
+  uint32 wall_clock_cap_min = 7;
+  uint32 retry_cap_per_subgoal = 8;
+}
+
+// PlanRejection is the structured form of a user reject.
+message PlanRejection {
+  string task_id = 1;
+  string plan_hash = 2;
+  string reason = 3;
+  string rejecter_oidc_subject = 4;
+  google.protobuf.Timestamp rejected_at = 5;
+}
+
+// Routing is the model-router's per-task decision.
+message Routing {
+  string executor_model = 1;           // e.g. "claude-opus-4-7"
+  string executor_vendor = 2;          // "anthropic" | "google" | "openai"
+  ModelTier executor_tier = 3;
+  string verifier_model = 4;
+  string verifier_vendor = 5;
+  ModelTier verifier_tier = 6;
+  double critical_score = 7;           // 0..100
+  bool is_critical = 8;
+  google.protobuf.Timestamp decided_at = 9;
+  string classifier_attestation_id = 10;
+}
+
+// Budget tracks cost / time / retry consumption against caps.
+// Mirrors docs/03-sdk/agent-sdk-reference.md "Budget".
+message Budget {
+  double spent_usd = 1;
+  double cap_usd = 2;
+  uint32 steps_used = 3;
+  uint32 steps_cap = 4;
+  uint64 wall_clock_used_seconds = 5;
+  uint64 wall_clock_cap_seconds = 6;
+  uint32 retries_used = 7;
+  uint32 retry_cap = 8;
+}

@@ -1,0 +1,10 @@
+{
+  "description": "Regression — Tier 3 timeout once left the verifier in a stuck state; verify the Tier 2.5 fallback fires cleanly.",
+  "stack": "rust-services",
+  "task_description": "Trigger a Tier 3 proof obligation that's known to timeout (the included module includes a hard math problem that exceeds the 30 min budget). The verifier MUST gracefully fall back to Tier 2.5 (exhaustive PBT + mutation + CODEOWNER review) and NOT hang.",
+  "budget_usd_max": 4.50,
+  "wall_clock_min_max": 35,
+  "expect_verifier_verdict": "either",
+  "expect_tier3_triggered": true,
+  "assert_no_security_incidents": true
+}

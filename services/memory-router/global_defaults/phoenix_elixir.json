@@ -1,0 +1,234 @@
+{
+  "bundle_version": "1",
+  "stack": "phoenix_elixir",
+  "generated_at": "2026-05-15T20:10:06.831727Z",
+  "generator_commit": "",
+  "license": {
+    "safe_for_redistribution": true,
+    "input_licenses_seen": [
+      "Apache-2.0",
+      "MIT"
+    ],
+    "excluded_licenses": [],
+    "attribution_file": "THIRD_PARTY_SOURCES.md"
+  },
+  "stats": {
+    "repos_examined": 200,
+    "configs_parsed": 120,
+    "agents_md_parsed": 80,
+    "pr_comments_mined": 0,
+    "adrs_parsed": 0,
+    "raw_candidates": 36,
+    "post_judge": 12,
+    "post_agreement": 12,
+    "active_rules": 12,
+    "suggested_rules": 0,
+    "candidate_rules": 0
+  },
+  "conventions": [
+    {
+      "id": "conv_global_phoenix_elixir_515379cc130c45d0",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "**/*.ex"
+      },
+      "rule_nl": "Modules use `MyApp.SubModule`; functions snake_case.",
+      "category": "Naming",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.831727Z",
+      "written_at": "2026-05-15T20:10:06.831727Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.831727Z",
+      "stack_tag": "phoenix_elixir"
+    },
+    {
+      "id": "conv_global_phoenix_elixir_61547895261243f9",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "lib/**/*.ex"
+      },
+      "rule_nl": "Contexts hide schemas from controllers.",
+      "category": "Layering",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.831727Z",
+      "written_at": "2026-05-15T20:10:06.831727Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.831727Z",
+      "stack_tag": "phoenix_elixir"
+    },
+    {
+      "id": "conv_global_phoenix_elixir_f663b026548e4d33",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "lib/**/*.ex"
+      },
+      "rule_nl": "Use `Ecto.Multi` for transactional writes.",
+      "category": "LibraryPreferences",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.831727Z",
+      "written_at": "2026-05-15T20:10:06.831727Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.831727Z",
+      "stack_tag": "phoenix_elixir"
+    },
+    {
+      "id": "conv_global_phoenix_elixir_f748668953504c23",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "test/**/*.exs"
+      },
+      "rule_nl": "Use ExUnit with `async: true` where state allows.",
+      "category": "TestPatterns",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.831727Z",
+      "written_at": "2026-05-15T20:10:06.831727Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.831727Z",
+      "stack_tag": "phoenix_elixir"
+    },
+    {
+      "id": "conv_global_phoenix_elixir_954a6bdf00de40fc",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "lib/**/*.ex"
+      },
+      "rule_nl": "Return `{:ok, _} | {:error, _}` tuples; raise only in tests.",
+      "category": "ErrorHandling",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.831727Z",
+      "written_at": "2026-05-15T20:10:06.831727Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.831727Z",
+      "stack_tag": "phoenix_elixir"
+    },
+    {
+      "id": "conv_global_phoenix_elixir_cffbcb02b7a74520",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "lib/**/*.ex"
+      },
+      "rule_nl": "Structured logs via `Logger.metadata`.",
+      "category": "Logging",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.831727Z",
+      "written_at": "2026-05-15T20:10:06.831727Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.831727Z",
+      "stack_tag": "phoenix_elixir"
+    },
+    {
+      "id": "conv_global_phoenix_elixir_601e9da0391947e2",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "priv/repo/migrations/**/*.exs"
+      },
+      "rule_nl": "Ecto migrations are additive-only.",
+      "category": "MigrationPatterns",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.831727Z",
+      "written_at": "2026-05-15T20:10:06.831727Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.831727Z",
+      "stack_tag": "phoenix_elixir"
+    },
+    {
+      "id": "conv_global_phoenix_elixir_5542f5b5af1e4907",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "*"
+      },
+      "rule_nl": "Conventional Commits + mix format.",
+      "category": "PrCommitHygiene",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.831727Z",
+      "written_at": "2026-05-15T20:10:06.831727Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.831727Z",
+      "stack_tag": "phoenix_elixir"
+    },
+    {
+      "id": "conv_global_phoenix_elixir_bfab46a446cf4e1f",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "lib/**/*.ex"
+      },
+      "rule_nl": "Pipelines apply `:fetch_session` + auth plug.",
+      "category": "SecurityDefaults",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.831727Z",
+      "written_at": "2026-05-15T20:10:06.831727Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.831727Z",
+      "stack_tag": "phoenix_elixir"
+    },
+    {
+      "id": "conv_global_phoenix_elixir_165c0600685d4093",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "lib/**/*.ex"
+      },
+      "rule_nl": "Preload associations via `Repo.preload`.",
+      "category": "PerformanceDefaults",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.831727Z",
+      "written_at": "2026-05-15T20:10:06.831727Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.831727Z",
+      "stack_tag": "phoenix_elixir"
+    },
+    {
+      "id": "conv_global_phoenix_elixir_18c9bafff2614454",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "lib/**/*.ex"
+      },
+      "rule_nl": "Use `Task.Supervisor` for fan-out; never raw `spawn`.",
+      "category": "Concurrency",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.831727Z",
+      "written_at": "2026-05-15T20:10:06.831727Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.831727Z",
+      "stack_tag": "phoenix_elixir"
+    },
+    {
+      "id": "conv_global_phoenix_elixir_2ed1123b30c24aae",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "lib/**_web/controllers/**/*.ex"
+      },
+      "rule_nl": "JSON envelope `{data, errors}`.",
+      "category": "ApiShape",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.831727Z",
+      "written_at": "2026-05-15T20:10:06.831727Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.831727Z",
+      "stack_tag": "phoenix_elixir"
+    }
+  ]
+}

@@ -1,0 +1,124 @@
+{
+  "$schema": "https://mintlify.com/schema.json",
+  "name": "Crucible",
+  "logo": {
+    "light": "/logo/light.svg",
+    "dark": "/logo/dark.svg"
+  },
+  "favicon": "/favicon.svg",
+  "colors": {
+    "primary": "#0F172A",
+    "light": "#1E293B",
+    "dark": "#020617",
+    "background": {
+      "light": "#FFFFFF",
+      "dark": "#020617"
+    }
+  },
+  "topbarLinks": [
+    { "name": "GitHub", "url": "https://github.com/crucible/crucible" },
+    { "name": "Status", "url": "https://status.crucible.dev" }
+  ],
+  "topbarCtaButton": {
+    "name": "Sign up",
+    "url": "https://app.crucible.dev/signup"
+  },
+  "anchors": [
+    { "name": "Architecture", "icon": "diagram-project", "url": "01-architecture" },
+    { "name": "SDK Reference", "icon": "code",            "url": "03-sdk" },
+    { "name": "Operations", "icon": "wrench",            "url": "04-operations" },
+    { "name": "Decisions",  "icon": "scale-balanced",    "url": "05-decisions" },
+    { "name": "Roadmap",    "icon": "road",              "url": "07-roadmap" }
+  ],
+  "navigation": [
+    {
+      "group": "Get started",
+      "pages": [
+        "README",
+        "00-vision/product-vision",
+        "00-vision/target-users",
+        "00-vision/competitive-landscape",
+        "00-vision/pricing-and-business"
+      ]
+    },
+    {
+      "group": "Quickstart",
+      "pages": [
+        "quickstart/install",
+        "quickstart/first-task",
+        "quickstart/verify-release"
+      ]
+    },
+    {
+      "group": "Architecture",
+      "pages": [
+        "01-architecture/system-overview",
+        "01-architecture/agent-control-plane",
+        "01-architecture/twin-runtime",
+        "01-architecture/verifier-pipeline",
+        "01-architecture/memory-layer",
+        "01-architecture/promotion-contract",
+        "01-architecture/threat-model",
+        "01-architecture/model-routing"
+      ]
+    },
+    {
+      "group": "Engineering",
+      "pages": [
+        "02-engineering/repo-structure",
+        "02-engineering/local-dev",
+        "02-engineering/tech-stack",
+        "02-engineering/testing-strategy",
+        "02-engineering/observability"
+      ]
+    },
+    {
+      "group": "SDK",
+      "pages": [
+        "03-sdk/agent-sdk",
+        "03-sdk/cli-reference",
+        "03-sdk/webhook-events",
+        "03-sdk/api-reference"
+      ]
+    },
+    {
+      "group": "Operations",
+      "pages": [
+        "04-operations/onboarding",
+        "04-operations/self-hosted-install",
+        "04-operations/runbooks"
+      ]
+    },
+    {
+      "group": "Decisions",
+      "pages": [
+        "05-decisions/ADR-001-anti-vibe-default",
+        "05-decisions/ADR-002-cross-family-verifier",
+        "05-decisions/ADR-003-procedural-memory-moat",
+        "05-decisions/ADR-004-cost-meter-budget-enforcer",
+        "05-decisions/ADR-005-pgvector-falkordb-graphiti",
+        "05-decisions/ADR-006-redis-hot-cache",
+        "05-decisions/ADR-007-hoverfly-tape-replay",
+        "05-decisions/ADR-008-tier3-annotation-default-off",
+        "05-decisions/ADR-009-bounded-budget-enforcer",
+        "05-decisions/ADR-010-sigstore-rekor-attestations",
+        "05-decisions/ADR-011-plug-into-ides",
+        "05-decisions/ADR-012-customer-controlled-keys",
+        "05-decisions/ADR-013-nix-for-tier4-builds",
+        "05-decisions/ADR-014-stripe-billing",
+        "05-decisions/ADR-015-helm-chart-deploy"
+      ]
+    },
+    {
+      "group": "Roadmap",
+      "pages": [
+        "07-roadmap/v1-mvp",
+        "07-roadmap/build-plan-agent-days",
+        "07-roadmap/v2-vision"
+      ]
+    }
+  ],
+  "footerSocials": {
+    "github": "https://github.com/crucible/crucible"
+  }
+}

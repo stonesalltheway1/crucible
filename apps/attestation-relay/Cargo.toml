@@ -1,0 +1,69 @@
+[package]
+name = "crucible-attestation-relay"
+version = "2026.6.0-phase6"
+edition = "2021"
+rust-version = "1.82"
+license = "Apache-2.0"
+description = "Crucible attestation relay — DSSE + Fulcio OIDC + Rekor v2 + journal fallback for all 13 in-toto predicate types"
+repository = "https://github.com/crucible/crucible"
+
+[[bin]]
+name = "crucible-attestation-relay"
+path = "src/main.rs"
+
+[lib]
+name = "crucible_attestation_relay"
+path = "src/lib.rs"
+
+[dependencies]
+tokio = { version = "1", features = ["full"] }
+async-trait = "0.1"
+thiserror = "2"
+anyhow = "1"
+
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+
+chrono = { version = "0.4", default-features = false, features = ["serde", "clock"] }
+
+sha2 = "0.10"
+hex = "0.4"
+base64 = "0.22"
+ed25519-dalek = { version = "2", features = ["rand_core", "pem"] }
+rand = "0.8"
+rand_core = { version = "0.6", features = ["getrandom"] }
+
+# HTTP client for Fulcio + Rekor v2.
+reqwest = { version = "0.12", default-features = false, features = ["json", "rustls-tls"] }
+url = "2"
+
+# Logging.
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter", "json"] }
+
+# HTTP server (axum + tower).
+axum = { version = "0.7", features = ["macros"] }
+tower = { version = "0.5", features = ["util"] }
+tower-http = { version = "0.6", features = ["trace", "cors"] }
+hyper = { version = "1", features = ["full"] }
+hyper-util = { version = "0.1", features = ["server", "tokio"] }
+
+# UUIDs for entry IDs.
+uuid = { version = "1", features = ["v4", "serde"] }
+
+[dev-dependencies]
+pretty_assertions = "1"
+tempfile = "3"
+proptest = "1.5"
+mockall = "0.13"
+wiremock = "0.6"
+
+[profile.release]
+codegen-units = 1
+lto = "fat"
+panic = "abort"
+strip = "symbols"
+
+[profile.dev]
+debug = 1
+opt-level = 0

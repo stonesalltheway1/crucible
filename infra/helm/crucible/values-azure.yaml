@@ -1,0 +1,11 @@
+# Azure-flavoured overrides.
+crucible:
+  postgres:
+    host: ""              # Azure Database for PostgreSQL flexible server
+  objectStorage:
+    type: s3              # Azure Blob via S3-compatible gateway
+  kms:
+    provider: azure-keyvault
+    keyRef: https://<vault>.vault.azure.net/keys/crucible-sign/<version>
+global:
+  storageClass: managed-csi-premium

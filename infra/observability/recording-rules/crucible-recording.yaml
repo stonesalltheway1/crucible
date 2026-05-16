@@ -1,0 +1,24 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: crucible-recording
+  namespace: observability
+spec:
+  groups:
+    - name: crucible.recording
+      interval: 30s
+      rules:
+        - record: crucible:cache_hit_ratio:5m
+          expr: |
+            sum(rate(crucible_tokens_cached_total[5m]))
+            / (sum(rate(crucible_tokens_fresh_total[5m])) + sum(rate(crucible_tokens_cached_total[5m])))
+        - record: crucible:median_task_cost_usd:1h
+          expr: histogram_quantile(0.5, sum(rate(crucible_task_cost_usd_bucket[1h])) by (le))
+        - record: crucible:p95_task_cost_usd:1h
+          expr: histogram_quantile(0.95, sum(rate(crucible_task_cost_usd_bucket[1h])) by (le))
+        - record: crucible:slo_promotion_canary_success:30d
+          expr: |
+            (1 - rate(crucible_promotion_canary_failures_total[30d]) / rate(crucible_promotion_total[30d]))
+        - record: crucible:slo_attestation_publish_success:30d
+          expr: |
+            (1 - rate(crucible_attestation_publish_failures_total[30d]) / rate(crucible_attestation_publish_total[30d]))

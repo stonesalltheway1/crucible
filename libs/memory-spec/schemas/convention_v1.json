@@ -1,0 +1,114 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://crucible.dev/memory/Convention/v1",
+  "title": "Convention",
+  "description": "Disk-serialized form of a Convention. Used for per-stack default bundles, repo_overrides files, and AGENTS.md-derived imports.",
+  "type": "object",
+  "required": [
+    "id", "tenant_id", "scope", "rule_nl", "category", "status",
+    "confidence", "valid_from", "written_at"
+  ],
+  "properties": {
+    "id":           { "type": "string", "pattern": "^conv_[A-Za-z0-9]{20,32}$" },
+    "tenant_id":    { "type": "string", "minLength": 1 },
+    "layer": {
+      "type": "string",
+      "enum": ["global_defaults", "org_overrides", "repo_overrides"]
+    },
+    "scope": {
+      "type": "object",
+      "properties": {
+        "repo":      { "type": "string" },
+        "file_glob": { "type": "string" },
+        "category":  { "type": "string" }
+      },
+      "additionalProperties": false
+    },
+    "rule_nl":      { "type": "string", "minLength": 1, "maxLength": 1024 },
+    "rule_machine": { "type": ["string", "null"] },
+    "category": {
+      "type": "string",
+      "enum": [
+        "Naming", "Layering", "LibraryPreferences", "TestPatterns",
+        "ErrorHandling", "Logging", "MigrationPatterns", "PrCommitHygiene",
+        "SecurityDefaults", "PerformanceDefaults", "Concurrency", "ApiShape"
+      ]
+    },
+    "status": {
+      "type": "string",
+      "enum": ["active", "drifting", "superseded", "rejected", "candidate", "suggested"]
+    },
+    "confidence": { "type": "number", "minimum": 0, "maximum": 1 },
+    "judge_score": { "type": "number", "minimum": 0, "maximum": 1 },
+    "judge_rationale": { "type": "string" },
+    "positive_examples": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/SourceRef" }
+    },
+    "negative_examples": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/SourceRef" }
+    },
+    "source_evidence": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/SourceRef" }
+    },
+    "first_seen":      { "type": "string", "format": "date-time" },
+    "last_reinforced": { "type": "string", "format": "date-time" },
+    "last_violated":   { "type": ["string", "null"], "format": "date-time" },
+    "valid_from":      { "type": "string", "format": "date-time" },
+    "valid_to":        { "type": ["string", "null"], "format": "date-time" },
+    "supersedes":      { "type": "array", "items": { "type": "string" } },
+    "writer_oidc_subject": { "type": "string" },
+    "written_at":      { "type": "string", "format": "date-time" },
+    "stack_tag":       { "type": "string" },
+    "anonymized_form": {
+      "description": "Set when this convention is eligible for cross-tenant federation graduation. Phase 5 records but does not act on this.",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "SourceRef": {
+      "type": "object",
+      "oneOf": [
+        {
+          "properties": {
+            "kind":       { "const": "pr_comment" },
+            "pr":         { "type": "integer" },
+            "comment_id": { "type": "string" }
+          },
+          "required": ["kind", "pr", "comment_id"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "kind":    { "const": "incident" },
+            "id":      { "type": "string" },
+            "service": { "type": "string" }
+          },
+          "required": ["kind", "id"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "kind":   { "const": "adr" },
+            "path":   { "type": "string" },
+            "commit": { "type": "string" }
+          },
+          "required": ["kind", "path"],
+          "additionalProperties": false
+        },
+        {
+          "properties": {
+            "kind":    { "const": "agent_observation" },
+            "task_id": { "type": "string" },
+            "step_id": { "type": "string" }
+          },
+          "required": ["kind", "task_id"],
+          "additionalProperties": false
+        }
+      ]
+    }
+  }
+}

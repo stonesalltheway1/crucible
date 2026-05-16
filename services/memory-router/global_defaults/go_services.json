@@ -1,0 +1,235 @@
+{
+  "bundle_version": "1",
+  "stack": "go_services",
+  "generated_at": "2026-05-15T20:10:06.826683Z",
+  "generator_commit": "",
+  "license": {
+    "safe_for_redistribution": true,
+    "input_licenses_seen": [
+      "Apache-2.0",
+      "BSD-3-Clause",
+      "MIT"
+    ],
+    "excluded_licenses": [],
+    "attribution_file": "THIRD_PARTY_SOURCES.md"
+  },
+  "stats": {
+    "repos_examined": 200,
+    "configs_parsed": 120,
+    "agents_md_parsed": 80,
+    "pr_comments_mined": 0,
+    "adrs_parsed": 0,
+    "raw_candidates": 36,
+    "post_judge": 12,
+    "post_agreement": 12,
+    "active_rules": 12,
+    "suggested_rules": 0,
+    "candidate_rules": 0
+  },
+  "conventions": [
+    {
+      "id": "conv_global_go_services_21e2b29faeb84218",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "**/*.go"
+      },
+      "rule_nl": "Test files end in `_test.go`; benchmarks in `_bench_test.go`.",
+      "category": "Naming",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.826683Z",
+      "written_at": "2026-05-15T20:10:06.826683Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.826683Z",
+      "stack_tag": "go_services"
+    },
+    {
+      "id": "conv_global_go_services_fb4bc6690c0a45bb",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "**/*.go"
+      },
+      "rule_nl": "Internal packages cannot import from `cmd/`.",
+      "category": "Layering",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.826683Z",
+      "written_at": "2026-05-15T20:10:06.826683Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.826683Z",
+      "stack_tag": "go_services"
+    },
+    {
+      "id": "conv_global_go_services_f5b2e8a6bc6e4f42",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "**/*.go"
+      },
+      "rule_nl": "Use `slog` for logging; never `log.Println` in service code.",
+      "category": "LibraryPreferences",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.826683Z",
+      "written_at": "2026-05-15T20:10:06.826683Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.826683Z",
+      "stack_tag": "go_services"
+    },
+    {
+      "id": "conv_global_go_services_3bb99ee3996f4fe6",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "**/*_test.go"
+      },
+      "rule_nl": "Table tests with `t.Run`; subtests for fixtures.",
+      "category": "TestPatterns",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.826683Z",
+      "written_at": "2026-05-15T20:10:06.826683Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.826683Z",
+      "stack_tag": "go_services"
+    },
+    {
+      "id": "conv_global_go_services_ef9136decd434a42",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "**/*.go"
+      },
+      "rule_nl": "Wrap errors with `%w`; never panic in library code.",
+      "category": "ErrorHandling",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.826683Z",
+      "written_at": "2026-05-15T20:10:06.826683Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.826683Z",
+      "stack_tag": "go_services"
+    },
+    {
+      "id": "conv_global_go_services_d7e6a10de5234634",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "**/*.go"
+      },
+      "rule_nl": "Structured `slog` calls with key-value pairs.",
+      "category": "Logging",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.826683Z",
+      "written_at": "2026-05-15T20:10:06.826683Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.826683Z",
+      "stack_tag": "go_services"
+    },
+    {
+      "id": "conv_global_go_services_658af9d206394bb4",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "db/migrations/**/*.sql"
+      },
+      "rule_nl": "Use Goose / sql-migrate; additive-only migrations.",
+      "category": "MigrationPatterns",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.826683Z",
+      "written_at": "2026-05-15T20:10:06.826683Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.826683Z",
+      "stack_tag": "go_services"
+    },
+    {
+      "id": "conv_global_go_services_5d8d9e8f0c444c8d",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "*"
+      },
+      "rule_nl": "Conventional Commits + gofmt.",
+      "category": "PrCommitHygiene",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.826683Z",
+      "written_at": "2026-05-15T20:10:06.826683Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.826683Z",
+      "stack_tag": "go_services"
+    },
+    {
+      "id": "conv_global_go_services_36215c7e335a4e5e",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "internal/api/**/*.go"
+      },
+      "rule_nl": "Auth middleware wraps every handler.",
+      "category": "SecurityDefaults",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.826683Z",
+      "written_at": "2026-05-15T20:10:06.826683Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.826683Z",
+      "stack_tag": "go_services"
+    },
+    {
+      "id": "conv_global_go_services_08d62360f7e94d98",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "internal/api/**/*.go"
+      },
+      "rule_nl": "Use cursor pagination via opaque tokens.",
+      "category": "PerformanceDefaults",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.826683Z",
+      "written_at": "2026-05-15T20:10:06.826683Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.826683Z",
+      "stack_tag": "go_services"
+    },
+    {
+      "id": "conv_global_go_services_f39f78284e2642cd",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "**/*.go"
+      },
+      "rule_nl": "Pass `context.Context` as the first argument through every async chain.",
+      "category": "Concurrency",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.826683Z",
+      "written_at": "2026-05-15T20:10:06.826683Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.826683Z",
+      "stack_tag": "go_services"
+    },
+    {
+      "id": "conv_global_go_services_41d47b35f4404b66",
+      "tenant_id": "global",
+      "scope": {
+        "file_glob": "internal/api/**/*.go"
+      },
+      "rule_nl": "Error envelope: `{ error: { code, message } }`.",
+      "category": "ApiShape",
+      "status": "active",
+      "confidence": 0.62,
+      "valid_from": "2026-05-15T20:10:06.826683Z",
+      "written_at": "2026-05-15T20:10:06.826683Z",
+      "layer": "global_defaults",
+      "judge_score": 0.95,
+      "first_seen": "2026-05-15T20:10:06.826683Z",
+      "stack_tag": "go_services"
+    }
+  ]
+}

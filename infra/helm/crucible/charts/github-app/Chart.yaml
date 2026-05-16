@@ -1,0 +1,6 @@
+apiVersion: v2
+name: github-app
+description: Crucible GitHub App (`/crucible <description>` PR comment surface).
+type: application
+version: 2026.6.0
+appVersion: "2026.06.0"
