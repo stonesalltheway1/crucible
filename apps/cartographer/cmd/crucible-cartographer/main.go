@@ -39,13 +39,26 @@ func main() {
 		slog.Warn("oss defaults loader degraded", "path", ossPath, "err", err)
 	}
 
-	llm := distill.NewClient(distill.Config{
+	// Distiller routing: prefer the in-cluster distiller service if its
+	// address is configured; otherwise fall back to the Anthropic
+	// Messages API directly when ANTHROPIC_API_KEY is set; otherwise
+	// run in offline mode (deterministic passes only).
+	llmCfg := distill.Config{
 		Endpoint: distillerAddr,
 		Model:    envOr("CRUCIBLE_DISTILLER_MODEL", "claude-haiku-4-5-20251001"),
-		// HTTP timeouts: distill calls are bounded by the distiller's own
-		// budget; we keep an outer ceiling of 5 minutes.
-		Timeout: 5 * time.Minute,
-	})
+		Timeout:  5 * time.Minute,
+	}
+	llmMode := "offline"
+	if distillerAddr != "" {
+		llmMode = "distiller-service"
+	} else if key := os.Getenv("ANTHROPIC_API_KEY"); key != "" {
+		llmCfg.APIKey = key
+		llmCfg.Provider = distill.ProviderAnthropic
+		llmMode = "anthropic-direct"
+	} else {
+		llmCfg.Provider = distill.ProviderOffline
+	}
+	llm := distill.NewClient(llmCfg)
 
 	srv := api.NewServer(api.Config{
 		Version:           version,
@@ -70,6 +83,8 @@ func main() {
 			"memory_router", memoryRouter,
 			"distiller", distillerAddr,
 			"oss_defaults_dir", ossPath,
+			"llm_mode", llmMode,
+			"llm_model", llmCfg.Model,
 		)
 		if err := httpServer.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
 			slog.Error("listen failed", "err", err)

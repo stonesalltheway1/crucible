@@ -33,35 +33,82 @@ import (
 	"github.com/crucible/apps/cartographer/internal/types"
 )
 
-// Client wraps the distiller HTTP endpoint OR the direct LLM endpoint.
+// Provider selects which backend the Client calls.
+type Provider string
+
+const (
+	// ProviderDistillerService routes through services/distiller (a
+	// Crucible-managed Python sidecar). Default for production.
+	ProviderDistillerService Provider = "distiller"
+	// ProviderAnthropic calls the Anthropic Messages API directly.
+	// Used when no Crucible distiller is deployed (single-service
+	// rollouts like the Phase-8 v1 fly.io deployment).
+	ProviderAnthropic Provider = "anthropic"
+	// ProviderOffline returns no candidates. Used when no LLM is
+	// reachable (air-gap dev, hermetic tests).
+	ProviderOffline Provider = "offline"
+)
+
+// Client wraps the distiller HTTP endpoint OR a direct LLM endpoint.
 type Client struct {
-	Endpoint string
-	Model    string
-	Timeout  time.Duration
-	HTTP     *http.Client
-	now      func() time.Time
-	mu       sync.Mutex // serialises retry counters
-	calls    int
+	Provider     Provider
+	Endpoint     string
+	Model        string
+	APIKey       string // only used when Provider == ProviderAnthropic
+	Timeout      time.Duration
+	HTTP         *http.Client
+	now          func() time.Time
+	mu           sync.Mutex // serialises retry counters
+	calls        int
 }
 
 // Config configures NewClient.
 type Config struct {
+	// Endpoint is the distiller service URL (provider=distiller) OR
+	// the Anthropic API base URL (provider=anthropic, default
+	// "https://api.anthropic.com"). Empty + no APIKey + no Provider
+	// override = offline mode.
 	Endpoint string
 	Model    string
 	Timeout  time.Duration
+	// APIKey, when set, switches the client to ProviderAnthropic and
+	// authenticates the Messages API call.
+	APIKey   string
+	Provider Provider
 }
 
-// NewClient builds a default client. If Endpoint is empty, distill
-// falls back to the offline-deterministic path (handy for dev /
-// fully-air-gapped runs).
+// NewClient builds a Client. The provider is auto-detected from the
+// config: APIKey set → Anthropic; Endpoint set without APIKey →
+// distiller service; neither → offline.
 func NewClient(cfg Config) *Client {
 	to := cfg.Timeout
 	if to == 0 {
 		to = 5 * time.Minute
 	}
+	provider := cfg.Provider
+	if provider == "" {
+		switch {
+		case cfg.APIKey != "":
+			provider = ProviderAnthropic
+		case cfg.Endpoint != "":
+			provider = ProviderDistillerService
+		default:
+			provider = ProviderOffline
+		}
+	}
+	endpoint := cfg.Endpoint
+	if provider == ProviderAnthropic && endpoint == "" {
+		endpoint = "https://api.anthropic.com"
+	}
+	model := cfg.Model
+	if provider == ProviderAnthropic && model == "" {
+		model = "claude-haiku-4-5-20251001"
+	}
 	return &Client{
-		Endpoint: cfg.Endpoint,
-		Model:    cfg.Model,
+		Provider: provider,
+		Endpoint: endpoint,
+		Model:    model,
+		APIKey:   cfg.APIKey,
 		Timeout:  to,
 		HTTP:     &http.Client{Timeout: to},
 		now:      time.Now,
@@ -124,10 +171,7 @@ Return ONLY the JSON array, no prose.`
 // Distill runs one excerpt through the LLM and returns the parsed
 // candidates. On schema-validation failure we retry once, then drop.
 func (c *Client) Distill(ctx context.Context, ex Excerpt) ([]types.ConventionCandidate, error) {
-	if c.Endpoint == "" {
-		// Offline path: fall back to a deterministic heuristic. This
-		// keeps the cartographer functional in dev / air-gap scenarios
-		// where no LLM endpoint is wired.
+	if c.Provider == ProviderOffline || (c.Provider == ProviderDistillerService && c.Endpoint == "") {
 		return offlineDistill(ex), nil
 	}
 	body := buildPrompt(ex)
@@ -240,12 +284,19 @@ func (c *Client) callOnce(ctx context.Context, prompt string) ([]rawRule, error)
 	c.mu.Lock()
 	c.calls++
 	c.mu.Unlock()
+	switch c.Provider {
+	case ProviderAnthropic:
+		return c.callAnthropic(ctx, prompt)
+	case ProviderDistillerService, "":
+		return c.callDistillerService(ctx, prompt)
+	}
+	return nil, fmt.Errorf("distill: unknown provider %q", c.Provider)
+}
+
+func (c *Client) callDistillerService(ctx context.Context, prompt string) ([]rawRule, error) {
 	req := map[string]any{
-		"model":  c.Model,
-		"prompt": prompt,
-		// We use the distiller-service contract here; the distiller
-		// (services/distiller) is the schema-validating front for the
-		// provider. The provider itself is opaque to cartographer.
+		"model":             c.Model,
+		"prompt":            prompt,
 		"max_output_tokens": 4096,
 		"temperature":       0.0,
 	}
@@ -267,7 +318,55 @@ func (c *Client) callOnce(ctx context.Context, prompt string) ([]rawRule, error)
 	if err := json.NewDecoder(resp.Body).Decode(&envelope); err != nil {
 		return nil, err
 	}
-	out := strings.TrimSpace(envelope.Output)
+	return parseRules(envelope.Output)
+}
+
+// callAnthropic talks to the Messages API directly. We don't depend
+// on the official SDK to keep the cartographer image at distroless
+// + ~12 MB.
+func (c *Client) callAnthropic(ctx context.Context, prompt string) ([]rawRule, error) {
+	req := map[string]any{
+		"model":      c.Model,
+		"max_tokens": 4096,
+		"system":     "You distill engineering conventions. Output ONLY the JSON array specified in the user prompt; no prose, no fenced-code wrapper.",
+		"messages": []map[string]any{
+			{"role": "user", "content": prompt},
+		},
+	}
+	body, _ := json.Marshal(req)
+	httpReq, _ := http.NewRequestWithContext(ctx, http.MethodPost, c.Endpoint+"/v1/messages", bytes.NewReader(body))
+	httpReq.Header.Set("Content-Type", "application/json")
+	httpReq.Header.Set("x-api-key", c.APIKey)
+	httpReq.Header.Set("anthropic-version", "2023-06-01")
+	resp, err := c.HTTP.Do(httpReq)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+	if resp.StatusCode != http.StatusOK {
+		buf, _ := io.ReadAll(io.LimitReader(resp.Body, 8192))
+		return nil, fmt.Errorf("anthropic HTTP %d: %s", resp.StatusCode, string(buf))
+	}
+	var envelope struct {
+		Content []struct {
+			Type string `json:"type"`
+			Text string `json:"text"`
+		} `json:"content"`
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&envelope); err != nil {
+		return nil, err
+	}
+	var combined strings.Builder
+	for _, c := range envelope.Content {
+		if c.Type == "text" {
+			combined.WriteString(c.Text)
+		}
+	}
+	return parseRules(combined.String())
+}
+
+func parseRules(raw string) ([]rawRule, error) {
+	out := strings.TrimSpace(raw)
 	// Strip a fenced-code wrapper if the model emitted one despite the
 	// "JSON only" instruction.
 	if strings.HasPrefix(out, "```") {
@@ -275,6 +374,13 @@ func (c *Client) callOnce(ctx context.Context, prompt string) ([]rawRule, error)
 		out = strings.TrimPrefix(out, "```")
 		out = strings.TrimSuffix(out, "```")
 		out = strings.TrimSpace(out)
+	}
+	// Some models prepend a sentence even when told not to. Find the
+	// first '[' as a salvage path.
+	if !strings.HasPrefix(out, "[") {
+		if i := strings.IndexByte(out, '['); i >= 0 {
+			out = out[i:]
+		}
 	}
 	var rules []rawRule
 	if err := json.Unmarshal([]byte(out), &rules); err != nil {
